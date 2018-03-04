@@ -1,0 +1,23 @@
+C_SOURCES = $(wildcard *.c)
+ASM_SOURCES = $(wildcard *.s)
+SOURCES = $(C_SOURCES) $(ASM_SOURCES)
+
+C_OBJECTS = $(C_SOURCES:c=o)
+ASM_OBJECTS = $(ASM_SOURCES:asm=o)
+OBJECTS = $(C_OBJECTS) $(ASM_OBJECTS)
+
+# .PHONY: all clean acia basic
+
+# all: acia basic
+
+# acia basic: $(SOURCES)
+	# zcc +rc2014 -subtype=$@ --max-allocs-per-node200000 $(SOURCES) -o kernel_$@ -create-app --reloc-info -gp
+
+# clean:
+	# rm -f *.bin *.def *.ihx *.sym *.reloc *.map
+
+all: $(SOURCES)
+	sdcc -mz80 -Iinclude $^
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
