@@ -23,4 +23,4 @@ void proc_delete(uint8_t id);
 void proc_switch();
 void proc_exit();
 
-#endif  // _INCLUDE_PROC_H
+#endif  // NDEF _INCLUDE_PROC_H
