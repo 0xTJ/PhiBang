@@ -19,7 +19,6 @@ void test1(void) {
 }
 
 void main() {
-    proc_0_init();
     proc_next = proc_create(30, test1);
     proc_switch();
     __asm

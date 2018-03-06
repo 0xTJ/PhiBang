@@ -1,7 +1,8 @@
 #include "proc.h"
 #include <stdlib.h>
+#include <limits.h>
     
-unsigned short proc_count = 0;
+unsigned short user_proc_count = 0;
 unsigned short proc_cur = 0;
 unsigned short proc_next = 0;
 struct proc_desc proc_table[TASK_MAX];
@@ -10,32 +11,31 @@ const static volatile void *tmp_entry;
 static volatile void *tmp_stack_pointer;
 static volatile unsigned short tmp_id;
 
-void proc_0_init() {
-    if (proc_count == 0) {
-        proc_table[0].status = 1;
-        proc_table[0].entry = NULL;
-        proc_count = 1;
-    }
+void proc_init() {
+    unsigned short i = 0;
+    proc_table[0].status = 1;
+    do {
+        i++;
+        proc_table[i].status = 0;
+    } while (i < TASK_MAX);
 }
 
 unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
     void *stack_bottom;
     
-    if (proc_count == 0)
-        return -1;
-    if (proc_count >= TASK_MAX - 1)
-        return -2;
+    if (user_proc_count >= TASK_MAX - 1)
+        return 0;
     
     for (tmp_id = 0; tmp_id < TASK_MAX; tmp_id++) {
         if (proc_table[tmp_id].status == 0)
             break;
     }
     if (tmp_id == TASK_MAX)
-        return -3;
+        return 0;
     
     stack_bottom = malloc(stack_size);
     if (stack_bottom == NULL)
-        return -4;
+        return 0;
     
     tmp_entry = entry;
     
@@ -83,14 +83,14 @@ unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
     pop     af
     __endasm;
     
-    proc_count++;
+    user_proc_count++;
     return tmp_id;
 }
 
 void proc_delete(unsigned short tmp_id) {
     proc_table[tmp_id].status = 0;
     free(proc_table[tmp_id].stack_bottom);
-    proc_count--;
+    user_proc_count--;
 }
 
 void proc_switch() {
