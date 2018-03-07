@@ -1,6 +1,5 @@
 #include "proc.h"
-#include <stdlib.h>
-#include <limits.h>
+#include "mem.h"
     
 unsigned short user_proc_count = 0;
 unsigned short proc_cur = 0;
@@ -11,7 +10,7 @@ const static volatile void *tmp_entry;
 static volatile void *tmp_stack_pointer;
 static volatile unsigned short tmp_id;
 
-void init() {
+void proc_init() {
     unsigned short i = 0;
     do {
         wipe_proc(proc_table + i);
@@ -19,14 +18,6 @@ void init() {
     } while (i < TASK_MAX);
 
     proc_table[0].status = 1;
-    proc_table[0].streams[0] = malloc(sizeof(FILE));
-    proc_table[0].streams[1] = malloc(sizeof(FILE));
-    proc_table[0].streams[2] = malloc(sizeof(FILE));
-    
-    proc_table[0].streams[0]->fpos = 0;
-    proc_table[0].streams[0]->err_ind = 0;
-    proc_table[0].streams[0]->eof_ind = EOF;
-    proc_table[0].streams[0]->buf = malloc(64);
 }
 
 void wipe_proc(struct proc_desc *desc) {
@@ -54,7 +45,7 @@ unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
     if (tmp_id == TASK_MAX)
         return 0;
     
-    stack_bottom = malloc(stack_size);
+    stack_bottom = k_malloc(stack_size);
     if (stack_bottom == NULL)
         return 0;
     
@@ -108,12 +99,6 @@ unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
     return tmp_id;
 }
 
-void proc_delete(unsigned short tmp_id) {
-    proc_table[tmp_id].status = 0;
-    free(proc_table[tmp_id].stack_bottom);  /* Fix so no free before done */
-    user_proc_count--;
-}
-
 void proc_switch() {
     if (proc_table[proc_next].status == 0)
         return;
@@ -143,8 +128,6 @@ void proc_switch() {
 }
 
 void proc_exit() {
-    proc_delete(proc_cur);
-    
     proc_next = 0;
     
     tmp_stack_pointer = proc_table[proc_next].stack_pointer;
@@ -158,5 +141,14 @@ void proc_exit() {
     pop     af
     __endasm;
     
+    proc_delete(proc_cur);
+    
     proc_cur = proc_next;
+}
+
+void proc_delete(unsigned short id) {
+    proc_table[id].status = 0;
+    k_free(proc_table[id].stack_bottom);
+    wipe_proc(proc_table + id);
+    user_proc_count--;
 }

@@ -1,5 +1,6 @@
-#include <stdlib.h>
 #include "proc.h"
+#include "io.h"
+#include "acia.h"
 
 void test1(void) {
     __asm
@@ -20,6 +21,9 @@ void test1(void) {
 }
 
 int main() {
+    char tmp[10];
+    fd_table[0] = &acia_driver;
+    
     proc_next = proc_create(30, test1);
     proc_switch();
     __asm
@@ -44,5 +48,12 @@ int main() {
     out     (14), A
     pop AF
     __endasm;
+    
+    
+    while (1) {
+        acia_read(tmp, 1);
+        acia_write(tmp, 1);
+    }
+    
     return 0;
 }

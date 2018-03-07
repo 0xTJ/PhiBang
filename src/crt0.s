@@ -60,8 +60,9 @@ init:
     push    hl
     ld      hl, #s__HEAP
     push    hl
-    call    _minit
-    call    _init
+    call    _acia_init
+    call    _mem_init
+    call    _proc_init
     call    _main
 	jp	_exit
 

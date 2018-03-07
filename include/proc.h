@@ -17,7 +17,7 @@ struct proc_desc {
 extern unsigned short int proc_next;
 extern unsigned short int proc_cur;
 
-void proc_0_init();
+void proc_init();
 void wipe_proc(struct proc_desc *desc);
 unsigned short int proc_create(size_t stack_size, void (*entry)(void));
 void proc_delete(unsigned short id);

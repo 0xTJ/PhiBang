@@ -1,5 +1,4 @@
 #include "io.h"
-#include "syscall.h"
 #include "proc.h"
 
 struct driver *fd_table[TASK_MAX * FOPEN_MAX] = {0};
