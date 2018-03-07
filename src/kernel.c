@@ -10,6 +10,7 @@ void test1(void) {
     __endasm;
     proc_next = 0;
     proc_switch();
+    proc_exit();
     __asm
     push AF
     ld      A, #12
@@ -18,7 +19,7 @@ void test1(void) {
     __endasm;
 }
 
-void main() {
+int main() {
     proc_next = proc_create(30, test1);
     proc_switch();
     __asm
@@ -43,4 +44,5 @@ void main() {
     out     (14), A
     pop AF
     __endasm;
+    return 0;
 }

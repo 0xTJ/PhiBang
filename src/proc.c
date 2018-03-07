@@ -11,13 +11,34 @@ const static volatile void *tmp_entry;
 static volatile void *tmp_stack_pointer;
 static volatile unsigned short tmp_id;
 
-void proc_init() {
+void init() {
     unsigned short i = 0;
-    proc_table[0].status = 1;
     do {
+        wipe_proc(proc_table + i);
         i++;
-        proc_table[i].status = 0;
     } while (i < TASK_MAX);
+
+    proc_table[0].status = 1;
+    proc_table[0].streams[0] = malloc(sizeof(FILE));
+    proc_table[0].streams[1] = malloc(sizeof(FILE));
+    proc_table[0].streams[2] = malloc(sizeof(FILE));
+    
+    proc_table[0].streams[0]->fpos = 0;
+    proc_table[0].streams[0]->err_ind = 0;
+    proc_table[0].streams[0]->eof_ind = EOF;
+    proc_table[0].streams[0]->buf = malloc(64);
+}
+
+void wipe_proc(struct proc_desc *desc) {
+    unsigned int i = 0;
+    desc->status = 0;
+    desc->stack_size = 0;
+    desc->stack_bottom = NULL;
+    desc->stack_pointer = NULL;
+    do {
+        desc->streams[i] = NULL;
+        i++;
+    } while (i < FOPEN_MAX);
 }
 
 unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
@@ -89,7 +110,7 @@ unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
 
 void proc_delete(unsigned short tmp_id) {
     proc_table[tmp_id].status = 0;
-    free(proc_table[tmp_id].stack_bottom);
+    free(proc_table[tmp_id].stack_bottom);  /* Fix so no free before done */
     user_proc_count--;
 }
 

@@ -1,64 +1,100 @@
 #ifndef _INCLUDE_STDLIB_H
 #define _INCLUDE_STDLIB_H
 
-#ifndef _DEFINED_NULL
-#define NULL 0
-#define _DEFINED_NULL
-#endif
+#define double float
+/* TYPES */
 
-#ifndef _DEFINED_EXIT_FAILURE
-#define EXIT_FAILURE 1
-#define _DEFINED_EXIT_FAILURE
-#endif
-
-#ifndef _DEFINED_EXIT_SUCCESS
-#define EXIT_SUCCESS 1
-#define _DEFINED_EXIT_SUCCESS
-#endif
-
-#ifndef _DEFINED_SIZE_T
+#ifndef _TYPEDEF_SIZE_T
 typedef unsigned short int size_t;
-#define _DEFINED_SIZE_T
+#define _TYPEDEF_SIZE_T
 #endif
 
-#ifndef _DEFINED_WCHAR_T
+#ifndef _TYPEDEF_WCHAR_T
 typedef unsigned short int wchar_t;
-#define _DEFINED_WCHAR_T
+#define _TYPEDEF_WCHAR_T
 #endif
 
-#ifndef _DEFINED_DIV_T
+#ifndef _TYPEDEF_DIV_T
 typedef struct {
   int quot;
   int rem;
 } div_t;
-#define _DEFINED_DIV_T
+#define _TYPEDEF_DIV_T
 #endif
 
-#ifndef _DEFINED_LDIV_T
+#ifndef _TYPEDEF_LDIV_T
 typedef struct {
   long int quot;
   long int rem;
 } ldiv_t;
-#define _DEFINED_LDIV_T
+#define _TYPEDEF_LDIV_T
 #endif
 
-enum zone_type { FREE=5, USED };
 
-struct _alloc_header;
-struct _alloc_header {
-    enum zone_type type;
-    struct _alloc_header *prev_free_ptr;
-    struct _alloc_header *next_free_ptr;
-    size_t zone_size;
-};
+/* MACROS */
 
-extern struct _alloc_header *heap_head;
-extern struct _alloc_header *heap_tail;
+#ifndef NULL
+#define NULL (0)
+#endif
 
-void *malloc(size_t size);
+#ifndef EXIT_FAILURE
+#define EXIT_FAILURE (1)
+#endif
+
+#ifndef EXIT_SUCCESS
+#define EXIT_SUCCESS (0)
+#endif
+
+#ifndef RAND_MAX
+#define RAND_MAX (0)
+#endif
+
+#ifndef MB_CUR_MAX
+#define MB_CUR_MAX (2)
+#endif
+
+
+/* FUNCTIONS */
+
+/* String Conversion */
+double atof(const char *nptr);
+int atoi(const char *nptr);
+long int atol(const char *nptr);
+double strtod(const char *nptr, char **endptr);
+long int strtol(const char *nptr, char **endptr, int base);
+unsigned long int strtoul(const char *nptr, char **endptr,
+        int base);
+/* Pseudo-random Sequence Generation */
+int rand(void);
+void srand(unsigned int seed);
+/* Memory Management */
+void *calloc(size_t nmemb, size_t size);
 void free(void *ptr);
+void *malloc(size_t size);
+void *realloc(void *ptr, size_t size);
+/* Communication with Environment */
+void abort(void);
+int atexit(void (*func)(void));
+void exit(int status);
+char *getenv(const char *name);
+int system(const char *string);
+/* Searching and Sorting */
+void *bsearch(const void *key, const void *base,
+        size_t nmemb, size_t size,
+        int (*compar)(const void *, const void *));
+void qsort(void *base, size_t nmemb, size_t size,
+        int (*compar)(const void *, const void *));
+/* Integer Arithmetic */
+int abs(int j);
+div_t div(int numer, int denom);
+long int labs(long int j);
+ldiv_t ldiv(long int numer, long int denom);
+/* Multibyte Character */
+int mblen(const char *s, size_t n);
+int mbtowc(wchar_t *pwc, const char *s, size_t n);
+int wctomb(char *s, wchar_t wchar);
+size_t mbstowcs(wchar_t *pwcs, const char *s, size_t n);
+size_t wcstombs(char *s, const wchar_t *pwcs, size_t n);
 
-void def_zone(void *ptr, size_t size, enum zone_type type);
-void redef_zone(void *ptr, enum zone_type type);
 
-#endif  // NDEF _INCLUDE_STDLIB_H
+#endif

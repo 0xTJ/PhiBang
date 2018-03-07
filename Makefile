@@ -2,7 +2,7 @@ CC = sdcc
 AS = sdasz80
 
 ASFLAGS = -plosgffw
-CFLAGS = -mz80 --xram-loc 0x8000 --nostdinc --nostdlib --no-std-crt0
+CFLAGS = -mz80 --xram-loc 0x8000 --nostdinc --nostdlib --no-std-crt0 --std-c89
 
 INC_DIR = include
 SRC_DIR = src

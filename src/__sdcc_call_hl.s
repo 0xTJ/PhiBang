@@ -1,7 +1,7 @@
 ;--------------------------------------------------------------------------
-;  crt0.s - Generic crt0.s for a Z80
+;  crtcall.s
 ;
-;  Copyright (C) 2000, Michael Hope
+;  Copyright (C) 2011, Maarten Brock
 ;
 ;  This library is free software; you can redistribute it and/or modify it
 ;  under the terms of the GNU General Public License as published by the
@@ -13,7 +13,7 @@
 ;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ;  GNU General Public License for more details.
 ;
-;  You should have received a copy of the GNU General Public License 
+;  You should have received a copy of the GNU General Public License
 ;  along with this library; see the file COPYING. If not, write to the
 ;  Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
 ;   MA 02110-1301, USA.
@@ -26,83 +26,12 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.module crt0
-	.globl	_main
-
-	.area	_HEADER (ABS)
-	;; Reset vector
-	.org 	0
-	jp	init
-
-	.org	0x08
-	reti
-	.org	0x10
-	reti
-	.org	0x18
-	reti
-	.org	0x20
-	reti
-	.org	0x28
-	reti
-	.org	0x30
-	reti
-	.org	0x38
-	call    interrupt
-
-	.org	0x100
-init:
-	;; Set stack pointer directly above top of memory.
-	ld	sp,#0x0000
-
-	;; Initialise global variables
-	call	gsinit
-    ld      hl, #l__HEAP
-    push    hl
-    ld      hl, #s__HEAP
-    push    hl
-    call    _minit
-    call    _init
-    call    _main
-	jp	_exit
-
-	;; Ordering of segments for the linker.
-	.area	_HOME
-	.area	_CODE
-	.area	_INITIALIZER
-	.area   _GSINIT
-	.area   _GSFINAL
-
-	.area	_DATA
-	.area	_INITIALIZED
-	.area	_BSEG
-	.area   _BSS
-	.area   _HEAP
-
 	.area   _CODE
-__clock::
-	ld	a,#2
-	rst	0x08
-	ret
 
-_exit::
-	;; Exit - special code to the emulator
-	ld	a,#0
-	rst	0x08
-1$:
-	halt
-	jr	1$
+	.globl ___sdcc_call_hl
 
-	.area   _GSINIT
-gsinit::
-	ld	bc, #l__INITIALIZER
-	ld	a, b
-	or	a, c
-	jr	Z, gsinit_next
-	ld	de, #s__INITIALIZED
-	ld	hl, #s__INITIALIZER
-	ldir
-gsinit_next:
+; The Z80 has the jp (hl) instruction, which is perfect for implementing function pointers.
 
-	.area   _GSFINAL
-	ret
+___sdcc_call_hl:
+	jp	(hl)
 
