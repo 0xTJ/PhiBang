@@ -1,16 +1,17 @@
 #include "io.h"
 #include "proc.h"
 
-struct driver *fd_table[TASK_MAX * FOPEN_MAX] = {0};
+struct vnode vnode_table[16];
+struct open_file open_file_table[16];
 
-size_t read(int fd, void *buf, size_t count) {
-    struct driver *file_num = fd_table[proc_cur * FOPEN_MAX + fd];
-    size_t tmp = file_num->read(buf, count);
-    return tmp;
+
+
+int get(int fd) {
+    struct open_file *this_file = proc_table[proc_cur].fd_table[fd];
+    return this_file->vnode_p->get();
 }
 
-size_t write(int fd, const void *buf, size_t nbytes) {
-    struct driver *file_num = fd_table[proc_cur * FOPEN_MAX + fd];
-    size_t tmp = file_num->write(buf, nbytes);
-    return tmp;
+void put(int fd, int c) {
+    struct open_file *this_file = proc_table[proc_cur].fd_table[fd];
+    this_file->vnode_p->put((char)c);
 }

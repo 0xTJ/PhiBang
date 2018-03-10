@@ -3,14 +3,29 @@
 
 #include <stddef.h>
 
-struct driver {
-    size_t (*read)(void *buf, size_t count);
-    size_t (*write)(const void *buf, size_t nbytes);
+enum file_type { TYPE_NONE = 0, TYPE_BIN_STREAM };
+enum file_mode { MODE_NONE = 0, MODE_READ, MODE_WRITE, MODE_READ_WRITE };
+
+struct vnode {
+    enum file_type type;
+    size_t size;
+    size_t ref_count;
+    void (*put)(char c);
+    char (*get)();
+    int (*control)(void *desc);
 };
 
-extern struct driver *fd_table[];
+struct open_file {
+    enum file_mode mode;
+    size_t offset;
+    struct vnode *vnode_p;
+    size_t ref_count;
+};
 
-size_t read(int fd, void *buf, size_t count);
-size_t write(int fd, const void *buf, size_t nbytes);
+extern struct open_file open_file_table[];
+extern struct vnode vnode_table[];
+
+int get(int fd);
+void put(int fd, int c);
 
 #endif

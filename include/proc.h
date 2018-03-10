@@ -7,20 +7,21 @@
 #define TASK_MAX (8)
 
 struct proc_desc {
-    unsigned char status;
+    char status;
     size_t stack_size;
     void *stack_bottom;
     void *stack_pointer;
-    FILE *streams[FOPEN_MAX];
+    struct open_file *fd_table[FOPEN_MAX];
 };
 
-extern unsigned short int proc_next;
-extern unsigned short int proc_cur;
+extern int proc_next;
+extern int proc_cur;
+extern struct proc_desc proc_table[TASK_MAX];
 
 void proc_init();
-void wipe_proc(struct proc_desc *desc);
-unsigned short int proc_create(size_t stack_size, void (*entry)(void));
-void proc_delete(unsigned short id);
+int proc_create(size_t stack_size, void (*entry)(void));
+void proc_setup(int pid, void (*entry)(void));
+void proc_delete(unsigned short pid);
 void proc_switch();
 void proc_exit();
 

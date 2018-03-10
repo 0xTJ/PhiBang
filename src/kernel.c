@@ -2,58 +2,40 @@
 #include "io.h"
 #include "acia.h"
 
-void test1(void) {
-    __asm
-    push AF
-    ld      A, #10
-    out     (10), A
-    pop AF
-    __endasm;
-    proc_next = 0;
-    proc_switch();
-    proc_exit();
-    __asm
-    push AF
-    ld      A, #12
-    out     (12), A
-    pop AF
-    __endasm;
+void init() {
+    struct vnode *v_acia = vnode_table + 0;
+    
+    struct open_file *acia_read = open_file_table + 0;
+    struct open_file *acia_write = open_file_table + 1;
+    
+    v_acia->size = TYPE_BIN_STREAM;
+    v_acia->size = 0;
+    v_acia->ref_count = 0;
+    v_acia->put = acia_put;
+    v_acia->get = acia_get;
+    v_acia->control = NULL;
+    
+    acia_read->mode = MODE_READ;
+    acia_read->offset = 0;
+    acia_read->vnode_p = v_acia;
+    acia_read->vnode_p->ref_count++;
+    acia_read->ref_count = 0;
+    
+    acia_write->mode = MODE_WRITE;
+    acia_write->offset = 0;
+    acia_write->vnode_p = v_acia;
+    acia_write->vnode_p->ref_count++;
+    acia_write->ref_count = 0;
+    
+    proc_table[0].fd_table[0] = acia_read;
+    proc_table[0].fd_table[0]->ref_count++;
+    proc_table[0].fd_table[1] = acia_write;
+    proc_table[0].fd_table[1]->ref_count++;
+    proc_table[0].fd_table[2] = acia_write;
+    proc_table[0].fd_table[2]->ref_count++;
 }
 
 int main() {
-    char tmp[10];
-    fd_table[0] = &acia_driver;
-    
-    proc_next = proc_create(30, test1);
-    proc_switch();
-    __asm
-    push AF
-    ld      A, #11
-    out     (11), A
-    pop AF
-    __endasm;
-    proc_next = 1;
-    proc_switch();
-    __asm
-    push AF
-    ld      A, #13
-    out     (13), A
-    pop AF
-    __endasm;
-    proc_next = 1;
-    proc_switch();
-    __asm
-    push AF
-    ld      A, #14
-    out     (14), A
-    pop AF
-    __endasm;
-    
-    
-    while (1) {
-        acia_read(tmp, 1);
-        acia_write(tmp, 1);
-    }
-    
-    return 0;
+    init();
+    put(1, 'f');
 }

@@ -1,17 +1,16 @@
 #ifndef _INCLUDE_STDDEF_H
 #define _INCLUDE_STDDEF_H
 
-
 /* TYPES */
 
-#ifndef _TYPEDEF_PTRDIFF_T
+#ifndef _TYPEDEF_ptrdiff_t
 typedef unsigned short int ptrdiff_t;
-#define _TYPEDEF_PTRDIFF_T
+#define _TYPEDEF_ptrdiff_t
 #endif
 
-#ifndef _TYPEDEF_SIZE_T
+#ifndef _TYPEDEF_size_t
 typedef unsigned short int size_t;
-#define _TYPEDEF_SIZE_T
+#define _TYPEDEF_size_t
 #endif
 
 /* MACROS */
@@ -19,10 +18,5 @@ typedef unsigned short int size_t;
 #ifndef NULL
 #define NULL (0)
 #endif
-
-#ifndef offsetof
-#define offsetof( type, member_designator ) (0)
-#endif
-
 
 #endif

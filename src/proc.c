@@ -1,60 +1,58 @@
 #include "proc.h"
-#include "mem.h"
+#include <stdlib.h>
+#include <string.h>
     
-unsigned short user_proc_count = 0;
-unsigned short proc_cur = 0;
-unsigned short proc_next = 0;
+int user_proc_count = 0;
+int proc_cur = 0;
+int proc_next = 0;
 struct proc_desc proc_table[TASK_MAX];
 
-const static volatile void *tmp_entry;
-static volatile void *tmp_stack_pointer;
-static volatile unsigned short tmp_id;
+const static volatile void *_tmp_entry;
+static volatile void *_tmp_stack_pointer;
+static volatile int _tmp_pid;
 
 void proc_init() {
-    unsigned short i = 0;
+    int i = 0;
     do {
-        wipe_proc(proc_table + i);
+        proc_table[i].status = 0;
         i++;
     } while (i < TASK_MAX);
 
     proc_table[0].status = 1;
 }
 
-void wipe_proc(struct proc_desc *desc) {
-    unsigned int i = 0;
-    desc->status = 0;
-    desc->stack_size = 0;
-    desc->stack_bottom = NULL;
-    desc->stack_pointer = NULL;
-    do {
-        desc->streams[i] = NULL;
-        i++;
-    } while (i < FOPEN_MAX);
-}
-
-unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
+int proc_create(size_t stack_size, void (*entry)(void)) {
     void *stack_bottom;
+    int pid;
     
     if (user_proc_count >= TASK_MAX - 1)
-        return 0;
+        return -1;
     
-    for (tmp_id = 0; tmp_id < TASK_MAX; tmp_id++) {
-        if (proc_table[tmp_id].status == 0)
+    for (pid = 0; pid < TASK_MAX; pid++) {
+        if (proc_table[pid].status == 0)
             break;
     }
-    if (tmp_id == TASK_MAX)
-        return 0;
+    if (pid == TASK_MAX)
+        return -1;
     
-    stack_bottom = k_malloc(stack_size);
+    stack_bottom = malloc(stack_size);
     if (stack_bottom == NULL)
-        return 0;
+        return -1;
     
-    tmp_entry = entry;
+    proc_table[pid].status = 1;
+    proc_table[pid].stack_size = stack_size;
+    proc_table[pid].stack_bottom = stack_bottom;
+    proc_table[pid].stack_pointer = (void *)((char *)stack_bottom + stack_size - 1);
     
-    proc_table[tmp_id].status = 1;
-    proc_table[tmp_id].stack_size = stack_size;
-    proc_table[tmp_id].stack_bottom = stack_bottom;
-    proc_table[tmp_id].stack_pointer = (void *)((char *)stack_bottom + stack_size - 1);
+    proc_setup(pid, entry);
+    
+    user_proc_count++;
+    return pid;
+}
+
+void proc_setup(int pid, void (*entry)(void)) __critical {
+    _tmp_pid = pid;
+    _tmp_entry = entry;
     
     __asm
     push    af
@@ -62,17 +60,17 @@ unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
     push    de
     push    hl
     push    ix
-    ld      (_tmp_stack_pointer), sp
+    ld      (__tmp_stack_pointer), sp
     __endasm;
     
-    proc_table[proc_cur].stack_pointer = tmp_stack_pointer;
-    tmp_stack_pointer = proc_table[tmp_id].stack_pointer;
+    proc_table[proc_cur].stack_pointer = _tmp_stack_pointer;
+    _tmp_stack_pointer = proc_table[_tmp_pid].stack_pointer;
     
     __asm
-    ld      sp, (_tmp_stack_pointer)
+    ld      sp, (__tmp_stack_pointer)
     ld      hl, #_proc_exit
     push    hl
-    ld      hl, (_tmp_entry)
+    ld      hl, (__tmp_entry)
     push    hl
     ld      hl, #0
     push    hl
@@ -80,26 +78,23 @@ unsigned short proc_create(size_t stack_size, void (*entry)(void)) {
     push    hl
     push    hl
     push    hl
-    ld      (_tmp_stack_pointer), sp
+    ld      (__tmp_stack_pointer), sp
     __endasm;
     
-    proc_table[tmp_id].stack_pointer = tmp_stack_pointer;
-    tmp_stack_pointer = proc_table[proc_cur].stack_pointer;
+    proc_table[_tmp_pid].stack_pointer = _tmp_stack_pointer;
+    _tmp_stack_pointer = proc_table[proc_cur].stack_pointer;
     
     __asm
-    ld      sp, (_tmp_stack_pointer)
+    ld      sp, (__tmp_stack_pointer)
     pop     ix
     pop     hl
     pop     de
     pop     bc
     pop     af
     __endasm;
-    
-    user_proc_count++;
-    return tmp_id;
 }
 
-void proc_switch() {
+void proc_switch() __critical {
     if (proc_table[proc_next].status == 0)
         return;
     
@@ -109,14 +104,14 @@ void proc_switch() {
     push    de
     push    hl
     push    ix
-    ld      (_tmp_stack_pointer), sp
+    ld      (__tmp_stack_pointer), sp
     __endasm;
     
-    proc_table[proc_cur].stack_pointer = tmp_stack_pointer;
-    tmp_stack_pointer = proc_table[proc_next].stack_pointer;
+    proc_table[proc_cur].stack_pointer = _tmp_stack_pointer;
+    _tmp_stack_pointer = proc_table[proc_next].stack_pointer;
     
     __asm
-    ld      sp, (_tmp_stack_pointer)
+    ld      sp, (__tmp_stack_pointer)
     pop     ix
     pop     hl
     pop     de
@@ -127,13 +122,13 @@ void proc_switch() {
     proc_cur = proc_next;
 }
 
-void proc_exit() {
+void proc_exit() __critical {
     proc_next = 0;
     
-    tmp_stack_pointer = proc_table[proc_next].stack_pointer;
+    _tmp_stack_pointer = proc_table[proc_next].stack_pointer;
     
     __asm
-    ld      sp, (_tmp_stack_pointer)
+    ld      sp, (__tmp_stack_pointer)
     pop     ix
     pop     hl
     pop     de
@@ -146,9 +141,9 @@ void proc_exit() {
     proc_cur = proc_next;
 }
 
-void proc_delete(unsigned short id) {
-    proc_table[id].status = 0;
-    k_free(proc_table[id].stack_bottom);
-    wipe_proc(proc_table + id);
+void proc_delete(unsigned short pid) {
+    /* close files */
+    proc_table[pid].status = 0;
+    free(proc_table[pid].stack_bottom);
     user_proc_count--;
 }
