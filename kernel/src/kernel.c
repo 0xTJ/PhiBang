@@ -3,6 +3,8 @@
 #include "acia.h"
 #include <stdio.h>
 
+extern void (*sosh_main)(void);
+
 void init() {
     reg_vnode(0, &acia_vnode);
     
@@ -15,12 +17,19 @@ void init() {
 }
 
 void main() {
-    char s[100];
+    char s[10];
+    int sosh_pid = -1;
+
     _setup_stdio();
     init();
-    fputs("\x1b[30;107m", stdout);
-    while (1) {
-        fgets(s, 10, stdin);
-        fputs(s, stdout);
-    }
+    sosh_pid = proc_create(100, (void *)&sosh_main);
+    
+    reg_fd(sosh_pid, 0, 0);
+    reg_fd(sosh_pid, 1, 1);
+    reg_fd(sosh_pid, 2, 1);
+    
+    proc_next = sosh_pid;
+    proc_switch();
+    
+    fputs("HALT\n", stdout);
 }

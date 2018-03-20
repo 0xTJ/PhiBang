@@ -1,14 +1,15 @@
 #include "proc.h"
-    
+#include <stdio.h>
+
 int user_proc_count = 0;
 int proc_cur = 0;
 int proc_user_cur = 0;
 int proc_next = 0;
 struct proc_desc proc_table[TASK_MAX];
 
-const static volatile void *tmp_entry;
-static volatile void *tmp_stack_pointer;
-static volatile int tmp_pid;
+volatile void (*tmp_entry)(void);
+volatile void *tmp_stack_pointer;
+volatile int tmp_pid;
 
 void proc_init() {
     int i = 0;
@@ -23,6 +24,7 @@ void proc_init() {
 int proc_create(size_t stack_size, void (*entry)(void)) {
     void *stack_bottom;
     int pid;
+    tmp_entry = entry;
     
     if (user_proc_count >= TASK_MAX - 1)
         return -1;
@@ -49,7 +51,7 @@ int proc_create(size_t stack_size, void (*entry)(void)) {
     return pid;
 }
 
-void proc_setup(int pid, void (*entry)(void)) __critical {
+void proc_setup(int pid, void (*entry)(void)) {
     tmp_pid = pid;
     tmp_entry = entry;
     
@@ -70,8 +72,7 @@ void proc_setup(int pid, void (*entry)(void)) __critical {
     ld      hl, #_proc_exit
     push    hl
     ld      hl, (_tmp_entry)
-    push    hl
-    ld      hl, #__setup_stdio
+    ld      (0xEEEA), hl
     push    hl
     ld      hl, #0
     push    hl
@@ -95,10 +96,10 @@ void proc_setup(int pid, void (*entry)(void)) __critical {
     __endasm;
 }
 
-void proc_switch() __critical {
+void proc_switch()  {
     if (proc_table[proc_next].status == 0)
         return;
-    
+
     __asm
     push    af
     push    bc
@@ -113,11 +114,16 @@ void proc_switch() __critical {
     
     __asm
     ld      sp, (_tmp_stack_pointer)
+    ld      hl, (_tmp_stack_pointer)
+    ld      (0xEEEE), hl
     pop     ix
     pop     hl
     pop     de
     pop     bc
     pop     af
+    pop     hl
+    push    hl
+    ld      (0xEEEC), hl
     __endasm;
     
     proc_cur = proc_next;
@@ -125,7 +131,7 @@ void proc_switch() __critical {
         proc_user_cur = proc_cur;
 }
 
-void proc_exit() __critical {
+void proc_exit() {
     proc_next = 0;
     
     tmp_stack_pointer = proc_table[proc_next].stack_pointer;

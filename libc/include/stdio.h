@@ -31,6 +31,7 @@ int fputc(int c, FILE *stream);
 int fputs(const char *s, FILE *stream);
 
 #define getchar() fgetc(stdin)
-#define putchar() fputc(stdout)
+#define putchar(c) fputc(c, stdout)
+#define puts(s) fputs(s, stdout);
 
 #endif
