@@ -8,7 +8,7 @@ libc:
 sosh: libc
 	$(MAKE) -C user/sosh
 
-kernel: libc sosh
+kernel: libc
 	$(MAKE) -C kernel
 
 clean:

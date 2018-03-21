@@ -22,6 +22,9 @@ void main() {
 
     _setup_stdio();
     init();
+    
+    puts("START\n");
+    
     sosh_pid = proc_create(100, (void *)&sosh_main);
     
     reg_fd(sosh_pid, 0, 0);
@@ -31,5 +34,5 @@ void main() {
     proc_next = sosh_pid;
     proc_switch();
     
-    fputs("HALT\n", stdout);
+    puts("HALT\n");
 }

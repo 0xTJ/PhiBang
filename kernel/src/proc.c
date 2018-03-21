@@ -51,7 +51,7 @@ int proc_create(size_t stack_size, void (*entry)(void)) {
     return pid;
 }
 
-void proc_setup(int pid, void (*entry)(void)) {
+void proc_setup(int pid, void (*entry)(void)) __critical {
     tmp_pid = pid;
     tmp_entry = entry;
     
@@ -72,9 +72,9 @@ void proc_setup(int pid, void (*entry)(void)) {
     ld      hl, #_proc_exit
     push    hl
     ld      hl, (_tmp_entry)
-    ld      (0xEEEA), hl
     push    hl
     ld      hl, #0
+    push    hl  ; Extra to accomodate __critical
     push    hl
     push    hl
     push    hl
@@ -96,7 +96,7 @@ void proc_setup(int pid, void (*entry)(void)) {
     __endasm;
 }
 
-void proc_switch()  {
+void proc_switch() __critical {
     if (proc_table[proc_next].status == 0)
         return;
 
@@ -114,16 +114,11 @@ void proc_switch()  {
     
     __asm
     ld      sp, (_tmp_stack_pointer)
-    ld      hl, (_tmp_stack_pointer)
-    ld      (0xEEEE), hl
     pop     ix
     pop     hl
     pop     de
     pop     bc
     pop     af
-    pop     hl
-    push    hl
-    ld      (0xEEEC), hl
     __endasm;
     
     proc_cur = proc_next;
@@ -131,7 +126,7 @@ void proc_switch()  {
         proc_user_cur = proc_cur;
 }
 
-void proc_exit() {
+void proc_exit() __critical {
     proc_next = 0;
     
     tmp_stack_pointer = proc_table[proc_next].stack_pointer;

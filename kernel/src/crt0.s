@@ -47,7 +47,7 @@
 	.org	0x30
 	reti
 	.org	0x38
-	call    interrupt
+	reti
 
 	.org	0x100
 init:

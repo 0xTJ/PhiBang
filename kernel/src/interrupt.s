@@ -2,6 +2,6 @@
 
 interrupt::
     di
-    call    _interrupt
+    call    _interrupt_c
     ei
     reti
