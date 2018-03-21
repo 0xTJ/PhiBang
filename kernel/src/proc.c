@@ -19,9 +19,11 @@ void proc_init() {
     } while (i < TASK_MAX);
 
     proc_table[0].status = 1;
+    proc_table[0].root = vfs_root;
+    proc_table[0].pwd = vfs_root;
 }
 
-int proc_create(size_t stack_size, void (*entry)(void)) {
+int proc_create(size_t stack_size, void (*entry)(void), struct vnode *root, struct vnode *pwd) {
     void *stack_bottom;
     int pid;
     tmp_entry = entry;
@@ -44,6 +46,8 @@ int proc_create(size_t stack_size, void (*entry)(void)) {
     proc_table[pid].stack_size = stack_size;
     proc_table[pid].stack_bottom = stack_bottom;
     proc_table[pid].stack_pointer = (void *)((char *)stack_bottom + stack_size - 1);
+    proc_table[pid].root = root;
+    proc_table[pid].pwd = pwd;
     
     proc_setup(pid, entry);
     
@@ -140,13 +144,16 @@ void proc_exit() __critical {
     pop     af
     __endasm;
     
-    proc_delete(proc_cur);
+    proc_delete(proc_user_cur);
     
     proc_cur = proc_next;
     proc_user_cur = -1;
 }
 
 void proc_delete(unsigned short pid) {
+    if (pid < 1)
+        return;
+    
     /* close files */
     proc_table[pid].status = 0;
     free(proc_table[pid].stack_bottom);

@@ -12,6 +12,8 @@ struct proc_desc {
     size_t stack_size;
     void *stack_bottom;
     void *stack_pointer;
+    struct vnode *root;
+    struct vnode *pwd;
     struct ofile *fd_table[FOPEN_MAX];
 };
 
@@ -20,7 +22,7 @@ extern int proc_cur;
 extern struct proc_desc proc_table[TASK_MAX];
 
 void proc_init();
-int proc_create(size_t stack_size, void (*entry)(void));
+int proc_create(size_t stack_size, void (*entry)(void), struct vnode *root, struct vnode *pwd);
 void proc_setup(int pid, void (*entry)(void));
 void proc_delete(unsigned short pid);
 void proc_switch();

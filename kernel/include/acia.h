@@ -3,7 +3,7 @@
 
 #include "io.h"
 
-extern struct vnode acia_vnode;
+extern struct driver acia_vnode;
 
 void acia_init();
 void acia_init0();

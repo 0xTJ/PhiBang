@@ -3,10 +3,10 @@
 
 int get(int fd) {
     struct ofile *this_file = proc_table[proc_cur].fd_table[fd];
-    return this_file->vnode_p->get();
+    return this_file->vnode_p->driver->get();
 }
 
 void put(int fd, int c) {
     struct ofile *this_file = proc_table[proc_cur].fd_table[fd];
-    this_file->vnode_p->put((char)c);
+    this_file->vnode_p->driver->put((char)c);
 }

@@ -1,52 +1,28 @@
 #include "io.h"
 #include "constants.h"
 
-struct ofile ofile_table[16];
+struct ofile ofile_table[MAX_OPEN_FILES];
 
-void reg_ofile(int file_index, int vnode_index, enum file_mode mode) {
-    struct ofile *target = ofile_table + file_index;
+int reg_ofile(struct vnode *vnode_p, enum file_mode mode) {
+    int i = 0;
+    int found_spot = -1;
+    struct ofile *target;
     
-    if (file_index < 0 || vnode_index < 0)
-        return;
+    do {
+        if (ofile_table[i].mode == MODE_NONE) {
+            found_spot = i;
+            break;
+        }
+    } while (i++ < MAX_OPEN_FILES - 1);
+    
+    if (found_spot < 0)
+        return -1;
+    
+    target = ofile_table + found_spot;
     
     target->mode = mode;
     target->offset = 0;
-    target->vnode_p = vnode_table + vnode_index;
-    target->ref_count = 0;
-    target->vnode_p->ref_count++;
-}
-
-void dereg_ofile(int file_index) {
-    struct ofile *target = ofile_table + file_index;
+    target->vnode_p = vnode_p;
     
-    if (file_index < 0)
-        return;
-    
-    if (target->mode != MODE_NONE && target->ref_count == 0) {
-        target->mode = MODE_NONE;
-        target->offset = 0;
-        target->vnode_p->ref_count--;
-        
-        /*
-        if (target->vnode_p->ref_count < 1)
-            dereg_vnode_by_p(target->vnode_p);
-        */
-        
-        target->vnode_p = NULL;
-    }
-}
-
-void dereg_ofile_by_p(struct ofile *target) {
-    if (target->mode != MODE_NONE && target->ref_count == 0) {
-        target->mode = MODE_NONE;
-        target->offset = 0;
-        target->vnode_p->ref_count--;
-        
-        /*  Uncomment these lines to automatically unmount when not referenced.
-        if (target->vnode_p->ref_count < 1)
-            dereg_vnode_by_p(target->vnode_p);
-        */
-        
-        target->vnode_p = NULL;
-    }
+    return found_spot;
 }
