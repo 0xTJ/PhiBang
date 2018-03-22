@@ -1,4 +1,0 @@
-
-void interrupt_c() {
-    
-}

@@ -1,9 +1,7 @@
 #include "proc.h"
 #include <stdio.h>
 
-int user_proc_count = 0;
 int proc_cur = 0;
-int proc_user_cur = 0;
 int proc_next = 0;
 struct proc_desc proc_table[TASK_MAX];
 
@@ -23,13 +21,10 @@ void proc_init() {
     proc_table[0].pwd = vfs_root;
 }
 
-int proc_create(size_t stack_size, void (*entry)(void), struct vnode *root, struct vnode *pwd) {
+pid_t proc_create(size_t stack_size, void (*entry)(void), struct vnode *root, struct vnode *pwd) {
     void *stack_bottom;
     int pid;
     tmp_entry = entry;
-    
-    if (user_proc_count >= TASK_MAX - 1)
-        return -1;
     
     for (pid = 0; pid < TASK_MAX; pid++) {
         if (proc_table[pid].status == 0)
@@ -51,7 +46,6 @@ int proc_create(size_t stack_size, void (*entry)(void), struct vnode *root, stru
     
     proc_setup(pid, entry);
     
-    user_proc_count++;
     return pid;
 }
 
@@ -126,8 +120,6 @@ void proc_switch() __critical {
     __endasm;
     
     proc_cur = proc_next;
-    if (proc_cur > 0)
-        proc_user_cur = proc_cur;
 }
 
 void proc_exit() __critical {
@@ -144,18 +136,15 @@ void proc_exit() __critical {
     pop     af
     __endasm;
     
-    proc_delete(proc_user_cur);
+    proc_delete(proc_cur);
     
     proc_cur = proc_next;
-    proc_user_cur = -1;
 }
 
-void proc_delete(unsigned short pid) {
-    if (pid < 1)
+void proc_delete(pid_t pid) {
+    if (pid < 2)
         return;
     
     /* close files */
-    proc_table[pid].status = 0;
     free(proc_table[pid].stack_bottom);
-    user_proc_count--;
 }

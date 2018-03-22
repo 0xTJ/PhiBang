@@ -1,5 +1,4 @@
 #include "io.h"
-#include "constants.h"
 
 #define DRIVER_COUNT 16
 

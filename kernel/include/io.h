@@ -1,7 +1,7 @@
 #ifndef _INCLUDE_IO_H
 #define _INCLUDE_IO_H
 
-#include "types.h"
+#include <stddef.h>
 
 enum file_mode { MODE_NONE = 0, MODE_READ, MODE_WRITE, MODE_READ_WRITE };
 
@@ -39,8 +39,5 @@ int reg_vnode(struct vnode *parent, struct driver *driver_desc, int name/*, inod
 int reg_ofile(struct vnode *vnode_p, enum file_mode mode);
 
 void reg_fd(int proc, int fd, int file_index);
-
-int get(int fd);
-void put(int fd, int c);
 
 #endif

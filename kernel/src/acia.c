@@ -1,5 +1,5 @@
 #include "acia.h"
-#include "constants.h"
+#include <stddef.h>
 
 struct driver acia_vnode = {
     "acia\0\0\0",

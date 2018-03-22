@@ -45,7 +45,7 @@
 	.org	0x28
 	reti
 	.org	0x30
-	reti
+	jp      syscall
 	.org	0x38
 	reti
 

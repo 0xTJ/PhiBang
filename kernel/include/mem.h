@@ -1,8 +1,7 @@
 #ifndef _INCLUDE_MEM_H
 #define _INCLUDE_MEM_H
 
-#include "types.h"
-#include "constants.h"
+#include <stddef.h>
 
 extern void *global_base;
 

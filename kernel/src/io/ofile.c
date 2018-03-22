@@ -1,5 +1,4 @@
 #include "io.h"
-#include "constants.h"
 
 struct ofile ofile_table[MAX_OPEN_FILES];
 

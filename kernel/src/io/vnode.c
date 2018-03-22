@@ -1,6 +1,5 @@
 #include "io.h"
 #include "mem.h"
-#include "constants.h"
 
 struct vnode vfs_root_s = {
     NULL,

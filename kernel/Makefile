@@ -8,7 +8,7 @@ INC_DIR = include
 SRC_DIR = src
 OUT_DIR = bin
 
-CFLAGS := $(CFLAGS) -I$(INC_DIR) -I../libc/include -L../libc -llibc
+CFLAGS := $(CFLAGS) -I$(INC_DIR) -I../libc/include
 
 C_SOURCES = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(SRC_DIR)/*/*.c) $(wildcard $(SRC_DIR)/*/*/*.c)
 ASM_SOURCES = $(wildcard $(SRC_DIR)/*.s) $(wildcard $(SRC_DIR)/*/*.s) $(wildcard $(SRC_DIR)/*/*/*.s)

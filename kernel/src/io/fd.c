@@ -1,6 +1,5 @@
 #include "io.h"
 #include "proc.h"
-#include "constants.h"
 
 void reg_fd(int proc, int fd, int file_index) {
     if (proc < 0 || fd < 0 || file_index < 0)

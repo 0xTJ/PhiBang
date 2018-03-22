@@ -1,4 +1,4 @@
-    HEAP_SIZE = 1024
+    HEAP_SIZE = 2096
     
 	.area   _HEAP
 s__HEAP::
