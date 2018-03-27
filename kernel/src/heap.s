@@ -1,6 +1,5 @@
-    HEAP_SIZE = 2096
-    
+    .module heap
+    HEAP_SIZE = 0x400
+
 	.area   _HEAP
-s__HEAP::
     .blkb   HEAP_SIZE
-l__HEAP::

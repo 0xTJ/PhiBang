@@ -8,6 +8,7 @@ struct vnode vfs_root_s = {
 };
 
 struct vnode *vfs_root = &vfs_root_s;
+extern struct block_meta heap;
 
 int reg_vnode(struct vnode *parent, struct driver *driver_desc, int name/*, inode_t inode_num*/) {
     int i = 0;
@@ -21,16 +22,15 @@ int reg_vnode(struct vnode *parent, struct driver *driver_desc, int name/*, inod
     
     if (parent->children[name] != NULL)
         return -3;  /* Name already used */
-    
-    new_vnode = alloc(sizeof(struct vnode), 0);
+
+    new_vnode = alloc(sizeof(struct vnode), &heap);
     
     if (new_vnode == NULL)
         return -4;  /* No space for vnode in RAM */
     
     parent->children[name] = new_vnode;
     
-    if (driver_desc != NULL)
-        new_vnode->driver = driver_desc;
+    new_vnode->driver = driver_desc;
     
     i = 0;
     do {

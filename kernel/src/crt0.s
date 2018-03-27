@@ -56,17 +56,9 @@ init:
 
 	;; Initialise global variables
 	call	gsinit
-    call    _acia_init
-    ld      hl, #l__HEAP
-    push    hl
-    ld      hl, #s__HEAP
-    push    hl
-    call    _mem_init
-    pop     hl
-    pop     hl
-    call    _proc_init
+    ;call    _acia_init
     call    _main
-	jp	_exit
+	jp	    _halt
 
 	;; Ordering of segments for the linker.
 	.area	_HOME
@@ -87,7 +79,7 @@ __clock::
 	rst	0x08
 	ret
 
-_exit::
+_halt::
 	;; Exit - special code to the emulator
 	ld	a,#0
 	rst	0x08

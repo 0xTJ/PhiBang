@@ -1,12 +1,12 @@
 #ifndef _INCLUDE_PROC_H
 #define _INCLUDE_PROC_H
 
-#include <stdio.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #include "mem.h"
 #include "io.h"
 
-#define TASK_MAX (8)
+#define TASK_MAX (1 + 1)
 
 struct proc_desc {
     pid_t pid;
@@ -15,20 +15,19 @@ struct proc_desc {
     void *stack_bottom;
     void *stack_pointer;
     
+    struct block_meta *heap;
+    
     struct vnode *root;
     struct vnode *pwd;
-    struct ofile *fd_table[FOPEN_MAX];
+    
+    struct ofile *fd_table[RLIMIT_NOFILE];
 };
 
 extern int proc_next;
 extern int proc_cur;
-extern struct proc_desc proc_table[TASK_MAX];
+extern struct proc_desc proc_table[];
 
-void proc_init();
-pid_t proc_create(size_t stack_size, void (*entry)(void), struct vnode *root, struct vnode *pwd);
-void proc_setup(int pid, void (*entry)(void));
-void proc_delete(unsigned short pid);
+void proc_init_enter1(void (*entry)(void));
 void proc_switch();
-void proc_exit();
 
 #endif

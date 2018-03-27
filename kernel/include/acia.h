@@ -3,11 +3,11 @@
 
 #include "io.h"
 
-extern struct driver acia_vnode;
+extern struct driver acia_driver;
 
 void acia_init();
 void acia_init0();
-void acia_put(char c);
-char acia_get();
+int acia_put(char c);
+int acia_get();
 
 #endif
