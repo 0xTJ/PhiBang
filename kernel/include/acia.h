@@ -1,9 +1,9 @@
 #ifndef _INCLUDE_ACIA_H
 #define _INCLUDE_ACIA_H
 
-#include "io.h"
+#include "dev.h"
 
-extern struct driver acia_driver;
+extern struct char_device acia_device;
 
 void acia_init();
 void acia_init0();

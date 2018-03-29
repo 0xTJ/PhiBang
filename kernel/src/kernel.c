@@ -1,20 +1,11 @@
 #include <stdbool.h>
 #include "proc.h"
 #include "acia.h"
-#include "io.h"
+#include "ramdisk.h"
+#include "dev.h"
 
 void init() {
-    reg_vnode(vfs_root, NULL, 0);
-    reg_vnode(vfs_root->children[0], &acia_driver, 0);
-
-    reg_ofile(vfs_root->children[0]->children[0], MODE_READ);
-    reg_ofile(vfs_root->children[0]->children[0], MODE_WRITE);
-
-    proc_table[1].fd_table[0] = ofile_table + 0;
-    proc_table[1].fd_table[1] = ofile_table + 1;
-    proc_table[1].fd_table[2] = ofile_table + 1;
-
-    write(1, "HELLO", 5);
+    
 }
 
 struct block_meta heap;
@@ -29,7 +20,10 @@ void main() {
 
     heap.size = heap.size - sizeof(struct block_meta);
     heap.next = NULL;
-    heap.free = true;
+    heap.k_free = true;
+
+    add_device(&acia_device, CHAR_DEV);
+    add_device(&ramdisk_device, BLOCK_DEV);
 
     proc_init_enter1(init);
 }

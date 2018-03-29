@@ -1,7 +1,6 @@
 #include "proc.h"
 #include <stdbool.h>
 #include <string.h>
-#include "io.h"
 #include "mem.h"
 
 int proc_cur = 0;
@@ -39,10 +38,10 @@ void proc_init_enter1(void (*entry)(void)) {
     proc_table[1].heap = (void *)proc_mem;
     proc_table[1].heap->size = proc_table[1].stack_bottom - get_block(proc_table[1].heap);
     proc_table[1].heap->next = NULL;
-    proc_table[1].heap->free = true;
+    proc_table[1].heap->k_free = true;
 
-    proc_table[1].root = vfs_root;
-    proc_table[1].pwd = vfs_root;
+    // proc_table[1].root = vfs_root;
+    // proc_table[1].pwd = vfs_root;
 
     for (i = 0; i < RLIMIT_NOFILE; i++)
         proc_table[1].fd_table[i] = NULL;

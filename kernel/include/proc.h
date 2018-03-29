@@ -4,7 +4,6 @@
 #include <sys/resource.h>
 #include <unistd.h>
 #include "mem.h"
-#include "io.h"
 
 #define TASK_MAX (1 + 1)
 
