@@ -6,7 +6,7 @@
 enum DevType { NO_DEV = 0, CHAR_DEV, BLOCK_DEV };
 
 struct char_device {
-    void (*init)();
+    int (*init)();
     int (*put)(char c);
     int (*get)();
 };
@@ -17,12 +17,16 @@ struct block_device {
     int (*init)();
     int (*read)(void *buffer, unsigned long block);
     int (*write)(void *buffer, unsigned long block);
+    int (*read_dir)(unsigned long long addr);
+    int (*write_dir)(unsigned long long addr, unsigned char val);
 };
 
 struct device {
     enum DevType type;
     void *dev_desc;
 };
+
+extern struct device device_table[];
 
 dev_t add_device(void *device, enum DevType type);
 void remove_device(dev_t device);

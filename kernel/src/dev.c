@@ -21,6 +21,18 @@ dev_t add_device(void *device, enum DevType type) {
     
     device_table[found_spot].type = type;
     device_table[found_spot].dev_desc = device;
+    
+    switch (type) {
+    case CHAR_DEV:
+        if (((struct char_device *)device)->init != NULL)
+            ((struct char_device *)device)->init();
+        break;
+    case BLOCK_DEV:
+        if (((struct block_device *)device)->init != NULL)
+            ((struct block_device *)device)->init();
+        break;
+    }
+    
     return found_spot;
 }
 

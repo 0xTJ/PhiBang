@@ -3,6 +3,11 @@
 
 #include <sys/types.h>
 
+struct fs_type {
+    const char *name;
+    struct super_block *(*mount)(struct fs_type *, dev_t dev);
+};
+
 struct super_block {
     unsigned short block_size;
     struct fs_type *type;

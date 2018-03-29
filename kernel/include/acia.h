@@ -5,8 +5,7 @@
 
 extern struct char_device acia_device;
 
-void acia_init();
-void acia_init0();
+int acia_init();
 int acia_put(char c);
 int acia_get();
 
