@@ -17,8 +17,6 @@ struct block_device {
     int (*init)();
     int (*read)(void *buffer, unsigned long block);
     int (*write)(void *buffer, unsigned long block);
-    int (*read_dir)(unsigned long long addr);
-    int (*write_dir)(unsigned long long addr, unsigned char val);
 };
 
 struct device {

@@ -1,5 +1,5 @@
         .area	_CODE
 
-_getppid:
+_getppid::
         ld  hl, #04
         jp  __syscall

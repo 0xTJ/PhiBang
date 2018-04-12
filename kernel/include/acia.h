@@ -1,7 +1,7 @@
 #ifndef _INCLUDE_ACIA_H
 #define _INCLUDE_ACIA_H
 
-#include "dev.h"
+#include "devio.h"
 
 extern struct char_device acia_device;
 

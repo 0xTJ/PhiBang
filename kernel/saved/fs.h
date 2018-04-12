@@ -2,37 +2,54 @@
 #define _INCLUDE_FS_H
 
 #include <sys/types.h>
-#include "io.h"
-#include "dev.h"
-
-#define FS_MAX 4
-
-struct super_block {
-    unsigned long block_size;
-    struct block_device *block_device;
-    struct fs_type *type;
-    struct inode *(*alloc_inode)(struct super_block *sb);
-    void (*destroy_inode)(struct inode *inode);
-    struct super_block *next;
-};
 
 struct fs_type {
-    struct super_block *sb_list;
-    struct super_block *(*mount)(struct fs_type *type, struct block_device *block_device);
+    const char *name;
+    struct super_block *(*mount)(struct fs_type *, dev_t dev);
+};
+
+struct super_block {
+    unsigned short block_size;
+    struct fs_type *type;
+    struct sb_ops *ops;
+    struct block_device *dev;
+};
+
+struct sb_ops {
+    struct inode *(*alloc_inode)(struct super_block *);
+    void (*destroy_inode)(struct inode *);
 };
 
 struct inode {
-    struct super_block sb;
-    ssize_t (*read)(struct ofile *ofile, char *buf, size_t n, off_t offset);
-    ssize_t (*write)(struct ofile *ofile, const char *buf, size_t n, off_t offset);
+    unsigned short ino;
+    struct in_ops *ops;
+    struct in_file_ops *file_ops;
+    struct super_block *sb;
 };
 
-struct fs_type *fs_table[FS_MAX];
+struct in_ops {
+    int (*create)(struct inode *, struct dentry *, char *);
+    int (*mkdir)(struct inode *, struct dentry *, char *);
+};
 
-extern struct fs_type bfs_fs;
+struct in_file_ops {
+    ssize_t (*read)(struct file *, char *, size_t, off_t);
+    ssize_t (*write)(struct file *, const char *, size_t, off_t);
+    int (*open)(struct inode *, struct file *);
+};
 
-ssize_t reg_fs(struct fs_type *fs_type);
+struct dentry {
+    struct dent_ops *ops;
+    struct inode inode;
+    char name[];
+};
 
-int reg_ofile(struct inode *inode, enum file_mode mode);
+struct dent_ops {
+    void *nul;
+};
+
+struct file {
+    struct dentry *dentry;
+};
 
 #endif

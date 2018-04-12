@@ -17,9 +17,9 @@ const struct fs_type sfs_fs_type = {
     sfs_mount
 };
 
-const struct sb_ops sfs_sb_ops = {0
-    // sfs_alloc_inode,
-    // sfs_destroy_inode
+const struct sb_ops sfs_sb_ops = {
+    sfs_alloc_inode,
+    sfs_destroy_inode
 };
 
 const struct in_ops sfs_in_ops = {0
@@ -36,7 +36,7 @@ const struct in_file_ops sfs_in_file_ops = {0
 extern struct block_meta heap;
 
 struct super_block *sfs_mount(struct fs_type *type, dev_t dev) {
-    struct super_block *new_sb = k_alloc(sizeof(struct super_block), &heap);
+    struct super_block *new_sb = kalloc(sizeof(struct super_block), &heap);
     
     if (new_sb != NULL) {
         new_sb->block_size = ((struct block_device *)(device_table[dev].dev_desc))->read_dir(OFFSET_BLK_SIZE);
@@ -48,13 +48,20 @@ struct super_block *sfs_mount(struct fs_type *type, dev_t dev) {
     return new_sb;
 }
 
-// struct inode *sfs_alloc_inode(struct super_block *sb) {
-    // return NULL;
-// }
+struct inode *sfs_alloc_inode(struct super_block *sb) {
+    struct inode *inode = kalloc(sizeof(struct inode));
+    if (inode != NULL) {
+        inode.ino = 0;
+        inode.ops = &sfs_in_ops;
+        inode.file_ops = &sfs_in_file_ops;
+        inode.sb = sb;
+    }
+    return inode;
+}
 
-// void sfs_destroy_inode(struct inode *inode) {
-    // return;
-// }
+void sfs_destroy_inode(struct inode *inode) {
+    kfree(inode);
+}
 
 // int sfs_create(struct inode *inode, struct dentry *dentry, char *name) {
     // return -1;

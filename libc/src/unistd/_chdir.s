@@ -1,5 +1,5 @@
         .area	_CODE
 
-_chdir:
+_chdir::
         ld  hl, #01
         jp  __syscall

@@ -1,5 +1,5 @@
         .area	_CODE
 
-_fork:
+_fork::
         ld  hl, #02
         jp  __syscall

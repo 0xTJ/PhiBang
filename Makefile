@@ -1,6 +1,6 @@
 .PHONY: clean kernel libc user
 
-all: libc kernel user
+all: libc kernel
 
 libc:
 	$(MAKE) -C libc
@@ -8,7 +8,7 @@ libc:
 sosh: libc
 	$(MAKE) -C user/sosh
 
-kernel: libc
+kernel: libc 
 	$(MAKE) -C kernel
 
 clean:

@@ -1,7 +1,7 @@
 #ifndef _INCLUDE_RAMDISK_H
 #define _INCLUDE_RAMDISK_H
 
-#include "dev.h"
+#include "devio.h"
 
 extern const struct block_device ramdisk_device;
 
