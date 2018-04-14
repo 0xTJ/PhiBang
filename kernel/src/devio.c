@@ -1,12 +1,11 @@
 #include "devio.h"
 #include <stddef.h>
 
-#define DEVICE_COUNT 16
+struct device device_table[DEVICE_COUNT]; // rename to dev_tab
 
-struct device device_table[DEVICE_COUNT];
-
+void kprint(char *s);
 dev_t add_device(void *device, enum DevType type) {
-    int i = 0;
+    int i = 1;
     int found_spot = -1;
     
     do {
@@ -31,6 +30,17 @@ dev_t add_device(void *device, enum DevType type) {
         if (((struct block_device *)device)->init != NULL)
             ((struct block_device *)device)->init();
         break;
+    }
+    
+    {
+        char tmp[2] = { -1, '\0' };
+        kprint("Added device of type ");
+        tmp[0] = '0' + type;
+        kprint(tmp);
+        kprint(" as device ");
+        tmp[0] = '0' + found_spot;
+        kprint(tmp);
+        kprint(".\n");
     }
     
     return found_spot;

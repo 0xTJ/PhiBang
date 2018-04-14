@@ -17,7 +17,7 @@ const struct block_device ramdisk_device = {
 };
 
 int init_ramdisk() {
-    memset(ramdisk, 0, SIZE);
+    //memset(ramdisk, 0, SIZE);
     return 0;
 }
 

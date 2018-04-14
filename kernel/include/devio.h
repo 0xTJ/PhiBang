@@ -3,6 +3,8 @@
 
 #include <sys/types.h>
 
+#define DEVICE_COUNT 16
+
 enum DevType { NO_DEV = 0, CHAR_DEV, BLOCK_DEV };
 
 struct char_device {
