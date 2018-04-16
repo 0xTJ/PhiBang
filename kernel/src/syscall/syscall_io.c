@@ -114,7 +114,7 @@ int mount(dev_t dev_num, char *path, int fs_num) {// use dev path
     mnt_tab[mnt_num].fs_root = fs_root;
     mnt_tab[mnt_num].fs_num = fs_num;
 
-    fsp->fs_ops.mount(mnt_tab + mnt_num);
+    fsp->fs_ops.mount(mnt_num);
 
     {
         char tmp[2] = { -1, '\0' };
@@ -122,10 +122,27 @@ int mount(dev_t dev_num, char *path, int fs_num) {// use dev path
         tmp[0] = '0' + dev_num;
         kprint(tmp);
         kprint(" with fs ");
-        tmp[0] = '0' + fs_num;
+        tmp[0] = '0' + mnt_num;
         kprint(tmp);
         kprint(" to \"");
         kprint(path);
         kprint("\".\n");
+    }
+
+    {
+        char tmp[2] = { -1, '\0' };
+        kprint("Mounted inode ");
+        tmp[0] = '0' + fs_root->ino;
+        kprint(tmp);
+        kprint(" of mount ");
+        tmp[0] = '0' + mnt_num;
+        kprint(tmp);
+        kprint(" to inode ");
+        tmp[0] = '0' + mnt_tab[mnt_num].mount_point->ino;
+        kprint(tmp);
+        kprint(" of mount ");
+        tmp[0] = '0' + mnt_tab[mnt_num].mount_point->mnt_num;
+        kprint(tmp);
+        kprint(".\n");
     }
 }

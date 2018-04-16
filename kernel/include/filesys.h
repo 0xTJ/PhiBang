@@ -5,16 +5,18 @@
 
 struct inode {
     ino_t ino;
+    uint8_t mnt_num;
     uint8_t fs_num;
     dev_t dev;
     uint8_t ext_mount;
     uint8_t refs;
+    // add parent mount
 };
 
 struct mount;
 
 struct fs_ops {
-    void (*mount)(struct mount *mount);
+    void (*mount)(uint8_t mnt_num);
     void (*read_inode)(struct inode *inodep);
     void (*write_inode)(struct inode *inodep);
     ino_t (*find_ino)(char *path);
