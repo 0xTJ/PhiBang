@@ -20,17 +20,17 @@ struct block_meta *find_free_block(struct block_meta *current, size_t size) {
   return current;
 }
 
-void *kalloc(size_t size, struct block_meta *heap) {
+void *kmalloc(size_t size) {
     struct block_meta *block;
 
     if (size <= 0)
         return NULL;
 
-    block = find_free_block(heap, size);
+    block = find_free_block(&heap, size);
     if (block == NULL) {
         return NULL;
     } else {
-        if (block->size >= 2 * sizeof(struct block_meta)) {
+        if (block->size >= 2 * sizeof(struct block_meta) + size) {
             struct block_meta *next_block = (void *)((char *)get_block(block) + size);
             next_block->size = block->size - size - sizeof(struct block_meta);
             next_block->next = block->next;

@@ -12,13 +12,15 @@ struct block_meta {
   bool free;
 };
 
+extern struct block_meta heap;
+
 /* FUNCTIONS */
 
 struct block_meta *get_block_ptr(void *ptr);
 void *get_block(struct block_meta *ptr);
 struct block_meta *find_free_block(struct block_meta *current, size_t size);
 void mem_init(struct block_meta *heap, size_t heap_size);
-void *kalloc(size_t size, struct block_meta *heap);
+void *kmalloc(size_t size);
 void kfree(void *ptr);
 
 #endif

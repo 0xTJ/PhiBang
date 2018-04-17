@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "filesys.h"
+#include "fs.h"
 
 enum file_mode { MODE_NONE = 0, MODE_READ, MODE_WRITE, MODE_READ_WRITE };
 

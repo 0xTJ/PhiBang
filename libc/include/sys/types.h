@@ -10,7 +10,7 @@ typedef uint8_t dev_t;
 
 #ifndef _TYPEDEF_ino_t
 #define _TYPEDEF_ino_t
-typedef uint16_t ino_t;
+typedef uint32_t ino_t;
 #endif
 
 #ifndef _TYPEDEF_off_t

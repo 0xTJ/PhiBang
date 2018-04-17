@@ -1,76 +1,57 @@
 #include <stdbool.h>
 #include "proc.h"
 #include "acia.h"
-#include "ramdisk.h"
-#include "devio.h"
+#include "fs.h"
+#include "initrd.h"
+#include "../../initrd/initrd.img.h"
 
 void kprint(char *s) {
     while (*s != '\0')
         acia_put(*s++);
 }
 
-int mount(dev_t dev, char *path, int fs_num);
-
-void test_mount(uint8_t mnt_num) {
-    mnt_tab[mnt_num].fs_root->ino = 1;
-    mnt_tab[mnt_num].fs_root->mnt_num = mnt_num;
-    mnt_tab[mnt_num].fs_root->fs_num = mnt_tab[mnt_num].fs_num;
-    mnt_tab[mnt_num].fs_root->dev = mnt_tab[mnt_num].dev;
-    mnt_tab[mnt_num].fs_root->ext_mount = 0;
-}
-void test_read_inode(struct inode *inodep) {
-    return;
-}
-void test_write_inode(struct inode *inodep) {
-    return;
-}
-ino_t test_find_ino(char *path) {
-    if (path[0] == '/' && path[1] == '\0')
-        return 1;
-    else if (path[0] == '/' && path[1] == 'a' && path[3] != 'b')
-        return 2;
-    else if (path[0] == '/' && path[1] == 'a' && path[3] == 'b')
-        return 3;
-    else
-        return 0;
-}
-size_t test_read(struct inode *inodep, uint8_t *buf, size_t size, off_t offset) {
-    return 0;
-}
-ssize_t test_write(struct inode *inodep, uint8_t *buf, size_t size, off_t offset) {
-    return -1;
-}
-int test_open(struct inode *inodep, ino_t ino) {
-    return -1;
+void kput(char c) {
+    acia_put(c);
 }
 
-struct file_sys test_fs = {
-    {
-        test_mount,
-        test_read_inode,
-        test_write_inode,
-        test_find_ino
-    },
-    {
-        test_read,
-        test_write,
-        test_open
-    }
-};
+const char hex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+void kprintaddr(void *val) {
+    kput(hex[((uint16_t)val >> 12) & 0xF]);
+    kput(hex[((uint16_t)val >> 8) & 0xF]);
+    kput(hex[((uint16_t)val >> 4) & 0xF]);
+    kput(hex[((uint16_t)val >> 0) & 0xF]);
+}
 
 void init() {
     kprint("\n\nLoading PhiBang\n\n");
     
-    add_device(&acia_device, CHAR_DEV);
-    add_device(&ramdisk_device, BLOCK_DEV);
+    fs_root = initialise_initrd((size_t)initrd_img);
     
-    add_fs(&test_fs);
-    
-    mount(2, "/", 1);
-    mount(2, "/a/b", 1); // Implkemnt only mounting a device once
-    mount(2, "/a/b/a/b", 1);
-    mount(2, "/a/b/a/b", 1);
-    kprint("\n\nHalting\n\n");
+    {
+        int i = 0;
+        struct dirent *node = NULL;
+        while ( (node = readdir_fs(fs_root, i)) != 0) {
+            fs_node_t *fsnode = finddir_fs(fs_root, node->d_name);
+            
+            kprint("Found file ");
+            kprint(node->d_name);
+            
+            if ((fsnode->flags & (uint32_t)0x7) == FS_DIRECTORY) {
+                kprint("\n\t(directory)\n");
+            } else {
+                size_t j;
+                char buf[256];
+                size_t sz = read_fs(fsnode, 0, 256, buf);
+                kprint("\n\t contents: \"");
+                for (j = 0; j < sz; j++)
+                    kput(buf[j]);
+
+                kprint("\"\n");
+            }
+            i++;
+        } 
+    }
 }
 
 struct block_meta heap;
