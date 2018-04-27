@@ -3,10 +3,18 @@
 
 #include <sys/resource.h>
 #include <unistd.h>
+#include "fs.h"
 #include "mem.h"
-#include "io.h"
 
 #define TASK_MAX (1 + 1)
+
+enum file_mode { MODE_NONE = 0, MODE_READ, MODE_WRITE, MODE_READ_WRITE };
+
+struct ofile {
+    enum file_mode mode;
+    off_t offset;
+    fs_node_t *node;
+};
 
 struct proc_desc {
     pid_t pid;
@@ -17,10 +25,10 @@ struct proc_desc {
     
     struct block_meta *heap;
     
-    struct vnode *root;
-    struct vnode *pwd;
+    struct ofile *root;
+    struct ofile *pwd;
     
-    struct ofile *fd_table[RLIMIT_NOFILE];
+    struct ofile *ofile_tab[RLIMIT_NOFILE];
 };
 
 extern int proc_next;

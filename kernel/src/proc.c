@@ -26,7 +26,7 @@ void proc_init_enter1(void (*entry)(void)) {
         proc_table[i].root = NULL;
         proc_table[i].pwd = NULL;
         for (j = 0; j < RLIMIT_NOFILE; j++)
-            proc_table[i].fd_table[j] = NULL;
+            proc_table[i].ofile_tab[j] = NULL;
     }
 
     proc_table[1].pid = 1;
@@ -44,7 +44,7 @@ void proc_init_enter1(void (*entry)(void)) {
     // proc_table[1].pwd = vfs_root;
 
     for (i = 0; i < RLIMIT_NOFILE; i++)
-        proc_table[1].fd_table[i] = NULL;
+        proc_table[1].ofile_tab[i] = NULL;
 
     proc_cur = 1;
     

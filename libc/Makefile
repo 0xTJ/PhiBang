@@ -3,7 +3,7 @@ AS = sdasz80
 AR = sdar
 
 ASFLAGS = -plosgffw
-CFLAGS = -mz80 -c --nostdinc --nostdlib --no-std-crt0 --std-c99
+CFLAGS = -mz80 -c --nostdinc --nostdlib --no-std-crt0 --std-c99 --Werror
 ARFLAGS = -r
 
 INC_DIR = include

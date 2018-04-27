@@ -1,6 +1,9 @@
 #include "fs.h"
+#include "kio.h"
 
-fs_node_t *fs_root = 0;
+fs_node_t *fs_root = NULL;
+
+struct dirent dirent;
 
 size_t read_fs(fs_node_t *node, off_t offset, size_t size, uint8_t *buffer) {
   if (node->read != NULL)
@@ -31,10 +34,10 @@ void close_fs(fs_node_t *node) {
 }
 
 struct dirent *readdir_fs(fs_node_t *node, uint32_t index) {
-  if ((node->flags & (uint32_t)0x7) == FS_DIRECTORY && node->readdir != NULL)
-    return node->readdir(node, index);
-  else
-    return NULL;
+    if ((node->flags & (uint32_t)0x7) == FS_DIRECTORY && node->readdir != NULL)
+        return node->readdir(node, index);
+    else
+        return NULL;
 }
 
 fs_node_t *finddir_fs(fs_node_t *node, char *name) {

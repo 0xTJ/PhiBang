@@ -49,7 +49,7 @@
 	.org	0x38
 	reti
 
-	.org	0x100
+	.org	0x0100
 init:
 	;; Set stack pointer directly above top of memory.
 	ld	sp,#0x0000

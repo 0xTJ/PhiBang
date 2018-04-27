@@ -1,4 +1,4 @@
-#include "acia.h"
+#include "dev/acia.h"
 #include <stddef.h>
 
 struct char_device acia_device = {

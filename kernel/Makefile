@@ -2,7 +2,7 @@ CC = sdcc
 AS = sdasz80
 
 ASFLAGS = -plosgffw
-CFLAGS = -mz80 --xram-loc 0x8000 --nostdinc --nostdlib --no-std-crt0 --std-c99
+CFLAGS = -mz80 --xram-loc 0x8000 --nostdinc --nostdlib --no-std-crt0 --std-c99 #--Werror
 
 INC_DIR = include
 SRC_DIR = src
@@ -22,7 +22,7 @@ USR_REL = $(wildcard ../user/*/*.rel)
 
 .PHONY: all clean
 
-all: $(OUT_DIR)/kernel.bin	
+all: $(OUT_DIR)/kernel.bin
 
 $(OUT_DIR)/kernel.ihx: $(REL) $(USR_REL)
 	$(CC) $(CFLAGS) $^ -o $@
@@ -32,6 +32,9 @@ $(OUT_DIR)/kernel.ihx: $(REL) $(USR_REL)
 
 %.rel: %.s
 	$(AS) $(ASFLAGS) $@ $<
+
+src/kernel.rel: src/kernel.c ../initrd/initrd.img.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.rel: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

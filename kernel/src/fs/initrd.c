@@ -1,4 +1,4 @@
-#include "initrd.h"
+#include "fs/initrd.h"
 #include <dirent.h>
 #include <string.h>
 #include "mem.h"
@@ -10,12 +10,9 @@ fs_node_t *initrd_dev;              // We also add a directory node for /dev, so
 fs_node_t *root_nodes;              // List of file nodes.
 size_t nroot_nodes;                    // Number of file nodes.
 
-struct dirent dirent;
-
 static size_t initrd_read(fs_node_t *node, off_t offset, size_t size, uint8_t *buffer) {
     initrd_file_header_t header; // Optimise to use pointer maybe?
     memcpy(&header, &file_headers[node->inode], sizeof(initrd_file_header_t));
-
     if (offset > header.length)
         return 0;
     if (offset + size > header.length)
@@ -70,8 +67,8 @@ fs_node_t *initialise_initrd(size_t location) {
     initrd_root->write = 0;
     initrd_root->open = 0;
     initrd_root->close = 0;
-    initrd_root->readdir = &initrd_readdir;
-    initrd_root->finddir = &initrd_finddir;
+    initrd_root->readdir = initrd_readdir;
+    initrd_root->finddir = initrd_finddir;
     initrd_root->ptr = 0;
     initrd_root->impl = 0;
 
@@ -85,8 +82,8 @@ fs_node_t *initialise_initrd(size_t location) {
     initrd_dev->write = 0;
     initrd_dev->open = 0;
     initrd_dev->close = 0;
-    initrd_dev->readdir = &initrd_readdir;
-    initrd_dev->finddir = &initrd_finddir;
+    initrd_dev->readdir = initrd_readdir;
+    initrd_dev->finddir = initrd_finddir;
     initrd_dev->ptr = 0;
     initrd_dev->impl = 0;
 
@@ -99,14 +96,17 @@ fs_node_t *initialise_initrd(size_t location) {
         // Edit the file's header - currently it holds the file offset
         // relative to the start of the ramdisk. We want it relative to the start
         // of memory.
-        file_headers[i].offset += location;
+        if (((initrd_header_t *)location)->loaded == 0) {  // Prevents against overwrites in memory for RAM InitRD.
+            file_headers[i].offset += location;
+            ((initrd_header_t *)location)->loaded = 1;
+        }
         // Create a new file node.
         strcpy(root_nodes[i].name, file_headers[i].name);
         root_nodes[i].mask = root_nodes[i].uid = root_nodes[i].gid = 0;
         root_nodes[i].length = file_headers[i].length;
         root_nodes[i].inode = i;
         root_nodes[i].flags = FS_FILE;
-        root_nodes[i].read = &initrd_read;
+        root_nodes[i].read = initrd_read;
         root_nodes[i].write = 0;
         root_nodes[i].readdir = 0;
         root_nodes[i].finddir = 0;

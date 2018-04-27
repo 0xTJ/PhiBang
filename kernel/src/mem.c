@@ -1,4 +1,5 @@
 #include "mem.h"
+#include "kio.h"
 #include "proc.h"
 
 struct block_meta *get_block_ptr(void *ptr) {
@@ -28,6 +29,7 @@ void *kmalloc(size_t size) {
 
     block = find_free_block(&heap, size);
     if (block == NULL) {
+        kprint("Failed to allocate.\n");
         return NULL;
     } else {
         if (block->size >= 2 * sizeof(struct block_meta) + size) {

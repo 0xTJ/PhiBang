@@ -14,14 +14,17 @@
 #define FS_SYMLINK     0x06
 #define FS_MOUNTPOINT  0x08
 
+#define NAME_MAX 64 // only temp here
+
 struct fs_node;
+extern struct dirent dirent;
 
 typedef size_t (*read_type_t)(struct fs_node *, off_t, size_t, uint8_t *);
 typedef ssize_t (*write_type_t)(struct fs_node *, off_t, size_t, uint8_t *);
 typedef void (*open_type_t)(struct fs_node *, uint8_t, uint8_t);
 typedef void (*close_type_t)(struct fs_node *);
-typedef struct dirent * (*readdir_type_t)(struct fs_node *, uint32_t);
-typedef struct fs_node * (*finddir_type_t)(struct fs_node *, char *name);
+typedef struct dirent *(*readdir_type_t)(struct fs_node *, uint32_t);
+typedef struct fs_node *(*finddir_type_t)(struct fs_node *, char *name);
 
 typedef struct fs_node
 {
@@ -40,6 +43,7 @@ typedef struct fs_node
    readdir_type_t readdir;
    finddir_type_t finddir;
    struct fs_node *ptr; // Used by mountpoints and symlinks.
+   size_t refs;
 } fs_node_t;
 
 extern fs_node_t *fs_root;

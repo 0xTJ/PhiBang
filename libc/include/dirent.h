@@ -10,7 +10,7 @@ typedef uint32_t ino_t;
 
 struct dirent {
   ino_t d_ino;
-  char d_name[];
+  char d_name[64];
 }; 
 
 #endif

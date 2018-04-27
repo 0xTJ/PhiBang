@@ -1,9 +1,11 @@
 #ifndef _INCLUDE_DEV_H
 #define _INCLUDE_DEV_H
 
+#include <stdint.h>
 #include <sys/types.h>
+#include <stdbool.h>
 
-#define DEVICE_COUNT 16
+#define DEVICE_COUNT 4
 
 enum DevType { NO_DEV = 0, CHAR_DEV, BLOCK_DEV };
 
@@ -26,9 +28,10 @@ struct device {
     void *dev_desc;
 };
 
-extern struct device device_table[];
+extern struct device dev_tab[DEVICE_COUNT];
 
-dev_t add_device(void *device, enum DevType type);
+void init_devices();
+dev_t add_device(void *device, bool is_block, char *name);
 void remove_device(dev_t device);
 
 #endif
