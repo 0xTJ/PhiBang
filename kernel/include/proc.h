@@ -25,8 +25,8 @@ struct proc_desc {
     
     struct block_meta *heap;
     
-    struct ofile *root;
-    struct ofile *pwd;
+    fs_node_t *root;
+    fs_node_t *pwd;
     
     struct ofile *ofile_tab[RLIMIT_NOFILE];
 };
@@ -36,6 +36,7 @@ extern int proc_cur;
 extern struct proc_desc proc_table[];
 
 void proc_init_enter1(void (*entry)(void));
+void proc_post_setup(fs_node_t *root_node);
 void proc_switch();
 
 #endif

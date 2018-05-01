@@ -72,7 +72,7 @@ static fs_node_t *devfs_finddir(fs_node_t *node, char *name) {
 
 void _devfs_add(size_t index, bool is_block, char *name) {
     if (is_block)
-        kprint("WARNING: Block devices not yet implemented.\n");
+        KLOG(WARN, "Block devices not yet implemented");
     
     dev_root_nodes[index] = kmalloc(sizeof(fs_node_t));
     strcpy(dev_root_nodes[index]->name, name);

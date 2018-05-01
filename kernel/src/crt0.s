@@ -56,7 +56,7 @@ init:
 
 	;; Initialise global variables
 	call	gsinit
-    call    _acia_init
+    call    _acia_init ; TODO Is needed?
     call    _main
 	jp	    _halt
 

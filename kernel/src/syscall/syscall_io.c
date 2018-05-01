@@ -2,9 +2,7 @@
 #include "proc.h"
 #include "fs.h"
 
-int open(const char *path/*, int oflag. ...*/) {
-    fs_node_t *cur = fs_root;
-    int fd = 0;
+static fs_node_t *_traverse_path(fs_node_t *cur, const char *path) {
     do {
         if (cur->flags & FS_MOUNTPOINT)
             cur = cur->ptr;
@@ -19,6 +17,18 @@ int open(const char *path/*, int oflag. ...*/) {
             cur = finddir_fs(cur, chunk);
         }
     } while (cur != NULL && *path != NULL);
+    
+    while (cur && cur->flags & FS_MOUNTPOINT)
+        cur = cur->ptr;
+    
+    return cur;
+}
+
+int open(const char *path/*, int oflag. ...*/) {
+    fs_node_t *cur;
+    int fd = 0;
+    
+    cur = _traverse_path(proc_table[proc_cur].root, path);
 
     if (cur == NULL)
         return -1;

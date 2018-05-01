@@ -1,6 +1,7 @@
 #include "proc.h"
 #include <stdbool.h>
 #include <string.h>
+#include "kio.h"
 #include "mem.h"
 
 int proc_cur = 0;
@@ -39,10 +40,7 @@ void proc_init_enter1(void (*entry)(void)) {
     proc_table[1].heap->size = proc_table[1].stack_bottom - get_block(proc_table[1].heap);
     proc_table[1].heap->next = NULL;
     proc_table[1].heap->free = true;
-
-    // proc_table[1].root = vfs_root;
-    // proc_table[1].pwd = vfs_root;
-
+    
     for (i = 0; i < RLIMIT_NOFILE; i++)
         proc_table[1].ofile_tab[i] = NULL;
 
@@ -56,7 +54,6 @@ void proc_init_enter1(void (*entry)(void)) {
     push    bc
     push    de
     push    hl
-    push    ix
     push    iy
     ld      (_kernel_stack_pointer), sp
     
@@ -69,7 +66,6 @@ void proc_init_enter1(void (*entry)(void)) {
 00001$:
     ld      sp, (_kernel_stack_pointer)
     pop     iy
-    pop     ix
     pop     hl
     pop     de
     pop     bc
@@ -78,13 +74,18 @@ void proc_init_enter1(void (*entry)(void)) {
     __endasm;
 }
 
+void proc_post_setup(fs_node_t *root_node) {
+    proc_table[1].root = root_node;
+    proc_table[1].pwd = root_node;
+}
+
+
 void proc_switch() __critical {
     __asm
     push    af
     push    bc
     push    de
     push    hl
-    push    ix
     push    iy
     ld      (_tmp_stack_pointer), sp
     __endasm;
@@ -95,7 +96,6 @@ void proc_switch() __critical {
     __asm
     ld      sp, (_tmp_stack_pointer)
     pop     iy
-    pop     ix
     pop     hl
     pop     de
     pop     bc

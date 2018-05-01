@@ -21,10 +21,23 @@ txbusy:
     ret
 
 _acia_get::
+    in      a, (0x80)
+    bit     0, a
+    jr      nz, gotchar
+    ld      hl, #-1
+    ret
+gotchar:
+    in      a, (0x81)
+    ld      h, #0
+    ld      l, a
+    ret
+
+_acia_get_wait::
 waitch:
     in      a, (0x80)
     bit     0, a
     jr      z, waitch
     in      a, (0x81)
+    ld      h, #0
     ld      l, a
     ret
