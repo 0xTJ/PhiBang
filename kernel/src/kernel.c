@@ -27,57 +27,12 @@ const char welcome[] =
 "      by 0xTJ      " "\n"
 ;
 
-void kshell(fs_node_t *dev_dir) {
-    int acia_fd = open("/dev/acia");
-    char line_buf[64] = {0};
-    size_t line_length = 0;
-    
-    if (acia_fd < 0)
-        return;
-    
-    while (line_length < 64) {
-        size_t did_read = read(acia_fd, line_buf + line_length, 1);
-        if (did_read) {
-            write(acia_fd, line_buf + line_length, 1);
-            if (line_buf[line_length++] == '\n')
-                break;
-        }
-    }
-    
-    if (line_buf[0] = 'l') {
-        int i = 0;
-        struct dirent *node = NULL;
-        while ( (node = readdir_fs(proc_table[proc_cur].pwd, i)) != NULL) {
-            fs_node_t *fsnode = finddir_fs(dev_dir->ptr, node->d_name);
-
-            kprint("Found file ");
-            kprint(node->d_name);
-
-            if ((fsnode->flags & (uint32_t)0x7) == FS_DIRECTORY) {
-                kprint("\n\t(directory)\n");
-            } else {
-                size_t j;
-                char buf[1];
-                size_t sz;
-
-                sz = read_fs(fsnode, 0, 1, buf);
-                kprint("\n\t contents: \"");
-                for (j = 0; j < sz; j++)
-                    kput(buf[j]);
-
-                kprint("\"\n");
-            }
-            i++;
-        }
-    }
-}
-
 void init() {
     fs_node_t *dev_dir;
 
     fs_root = initialise_initrd((size_t)initrd_img);
     proc_post_setup(fs_root);
-    
+
     dev_dir = finddir_fs(fs_root, "dev");
     dev_dir->flags |= FS_MOUNTPOINT;
     dev_dir->ptr = initialise_devfs();
@@ -88,12 +43,47 @@ void init() {
     add_device(&null_device, false, "null");
     add_device(&zero_device, false, "zero");
 
-    kshell(dev_dir);
+    open("/dev/acia");
+    open("/dev/acia");
+    open("/dev/acia");
     
+    {
+        fs_node_t *tmp = finddir_fs(proc_table[proc_cur].pwd, "sosh.bin");
+        read_fs(tmp, 0, 256, (void *)0xA000);
+        KLOG(INFO, "Starting binary");
+        ((void (*)())0xA000)();
+        KLOG(INFO, "Done binary");
+    }
     
+    // {
+        // int i = 0;
+        // struct dirent *node = NULL;
+        // while ( (node = readdir_fs(proc_table[proc_cur].pwd, i)) != NULL) {
+            // fs_node_t *fsnode = finddir_fs(proc_table[proc_cur].pwd, node->d_name);
+
+            // kprint("Found file ");
+            // kprint(node->d_name);
+
+            // if ((fsnode->flags & (uint32_t)0x7) == FS_DIRECTORY) {
+                // kprint("\n\t(directory)\n");
+            // } else {
+                // size_t j;
+                // char buf[256];
+                // size_t sz;
+
+                // sz = read_fs(fsnode, 0, 256, buf);
+                // kprint("\n\t contents: \"");
+                // for (j = 0; j < sz; j++)
+                    // kput(buf[j]);
+
+                // kprint("\"\n");
+            // }
+            // i++;
+        // }
+    // }
 }
 
-struct block_meta heap;
+extern struct block_meta heap;
 
 void main() {
     __asm
@@ -113,6 +103,8 @@ void main() {
     // kprint(welcome);
     // kprint("\n\n");
     KLOG(INFO, "Starting PhiBang");
+
     proc_init_enter1(init);
+
     KLOG(INFO, "Halting");
 }

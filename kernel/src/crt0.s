@@ -52,7 +52,7 @@
 	.org	0x0100
 init:
 	;; Set stack pointer directly above top of memory.
-	ld	sp,#0x0000
+	ld	sp,#0xF000
 
 	;; Initialise global variables
 	call	gsinit
@@ -71,6 +71,7 @@ init:
 	.area	_INITIALIZED
 	.area	_BSEG
 	.area   _BSS
+    .area   _PROCMEM (ABS)
 	.area   _HEAP
 
 	.area   _CODE

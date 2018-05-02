@@ -13,7 +13,7 @@ volatile void *tmp_stack_pointer;
 volatile int tmp_pid;
 volatile void *kernel_stack_pointer;
 
-unsigned char proc_mem[RLIMIT_AS];
+extern unsigned char proc_mem[RLIMIT_AS];
 
 void proc_init_enter1(void (*entry)(void)) {
     int i, j;
@@ -23,7 +23,6 @@ void proc_init_enter1(void (*entry)(void)) {
         proc_table[i].stack_size = 0;
         proc_table[i].stack_bottom = NULL;
         proc_table[i].stack_pointer = NULL;
-        proc_table[i].heap = NULL;
         proc_table[i].root = NULL;
         proc_table[i].pwd = NULL;
         for (j = 0; j < RLIMIT_NOFILE; j++)
@@ -35,11 +34,6 @@ void proc_init_enter1(void (*entry)(void)) {
     proc_table[1].stack_size = RLIMIT_STACK;
     proc_table[1].stack_bottom = proc_mem + RLIMIT_AS - RLIMIT_STACK;
     proc_table[1].stack_pointer = proc_mem + RLIMIT_AS;
-
-    proc_table[1].heap = (void *)proc_mem;
-    proc_table[1].heap->size = proc_table[1].stack_bottom - get_block(proc_table[1].heap);
-    proc_table[1].heap->next = NULL;
-    proc_table[1].heap->free = true;
     
     for (i = 0; i < RLIMIT_NOFILE; i++)
         proc_table[1].ofile_tab[i] = NULL;

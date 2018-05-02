@@ -22,11 +22,11 @@ typedef unsigned long rlim_t;
 #endif
 
 #ifndef RLIMIT_STACK
-#define RLIMIT_STACK (1024)
+#define RLIMIT_STACK (0x0800)
 #endif
 
 #ifndef RLIMIT_AS
-#define RLIMIT_AS (4096)
+#define RLIMIT_AS (0x1000)
 #endif
 
 #endif

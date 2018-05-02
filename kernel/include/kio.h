@@ -33,12 +33,13 @@
 #define COLOURB_CYN CSI "46m"
 #define COLOURB_WIT CSI "47m"
 
-#define INFO COLOUR_RESET "[" COLOURF_GRN "INFO" COLOUR_RESET "]"
-#define WARN COLOUR_RESET "[" COLOURF_YEL "WARN" COLOUR_RESET "]"
+#define INFO COLOUR_RESET "[" COLOURF_GRN "INFO" COLOUR_RESET "] "
+#define WARN COLOUR_RESET "[" COLOURF_YEL "WARN" COLOUR_RESET "] "
 #define ERROR COLOUR_RESET "[" COLOURF_RED "ERROR" COLOUR_RESET "]"
 #define KLOG(level, message) kprint(level " " message "\n");
 
 void kput(char c);
 void kprint(char *s);
+void kput_uint16(unsigned short n);
 
 #endif

@@ -23,8 +23,6 @@ struct proc_desc {
     void *stack_bottom;
     void *stack_pointer;
     
-    struct block_meta *heap;
-    
     fs_node_t *root;
     fs_node_t *pwd;
     

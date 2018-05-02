@@ -5,6 +5,18 @@
 #define NULL ((void *)0)
 #endif
 
+#ifndef STDERR_FILENO
+#define STDERR_FILENO (2)
+#endif
+
+#ifndef STDIN_FILENO
+#define STDIN_FILENO (0)
+#endif
+
+#ifndef STDOUT_FILENO
+#define STDOUT_FILENO (1)
+#endif
+
 #ifndef _TYPEDEF_size_t
 #define _TYPEDEF_size_t
 typedef unsigned short size_t;

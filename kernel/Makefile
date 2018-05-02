@@ -18,13 +18,11 @@ C_REL = $(C_SOURCES:c=rel)
 ASM_REL = $(ASM_SOURCES:s=rel)
 REL = src/crt0.rel $(filter-out src/crt0.rel, $(ASM_REL) $(C_REL))
 
-USR_REL = $(wildcard ../user/*/*.rel)
-
 .PHONY: all clean
 
 all: $(OUT_DIR)/kernel.bin
 
-$(OUT_DIR)/kernel.ihx: $(REL) $(USR_REL)
+$(OUT_DIR)/kernel.ihx: $(REL)
 	$(CC) $(CFLAGS) $^ -o $@
 
 %.bin: %.ihx

@@ -11,14 +11,11 @@ void *get_block(struct block_meta *ptr) {
 }
 
 struct block_meta *find_free_block(struct block_meta *current, size_t size) {
-  while (current->next != NULL && !(current->free && current->size >= size)) {
-    current = current->next;
-  }
+    while (current != NULL && !(current->free && current->size >= size)) {
+        current = current->next;
+    }
   
-  if (!(current->free && current->size >= size))
-      current = NULL;
-  
-  return current;
+    return current;
 }
 
 void *kmalloc(size_t size) {
@@ -29,7 +26,7 @@ void *kmalloc(size_t size) {
 
     block = find_free_block(&heap, size);
     if (block == NULL) {
-        kprint("Failed to allocate.\n");
+        KLOG(ERROR, "Failed to allocate");
         return NULL;
     } else {
         if (block->size >= 2 * sizeof(struct block_meta) + size) {

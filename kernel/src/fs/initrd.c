@@ -1,6 +1,7 @@
 #include "fs/initrd.h"
 #include <dirent.h>
 #include <string.h>
+#include "kio.h"
 #include "mem.h"
 
 initrd_header_t *initrd_header;     // The header.
@@ -96,10 +97,7 @@ fs_node_t *initialise_initrd(size_t location) {
         // Edit the file's header - currently it holds the file offset
         // relative to the start of the ramdisk. We want it relative to the start
         // of memory.
-        if (((initrd_header_t *)location)->loaded == 0) {  // Prevents against overwrites in memory for RAM InitRD.
-            file_headers[i].offset += location;
-            ((initrd_header_t *)location)->loaded = 1;
-        }
+        file_headers[i].offset += location;
         // Create a new file node.
         strcpy(root_nodes[i].name, file_headers[i].name);
         root_nodes[i].mask = root_nodes[i].uid = root_nodes[i].gid = 0;
