@@ -1,6 +1,8 @@
 #ifndef _INCLUDE_KIO_H
 #define _INCLUDE_KIO_H
 
+#define DEBUG 1
+
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 #define GET_MACRO(_1,_2,NAME,...) NAME
@@ -10,7 +12,7 @@
 #define CSI ESC "["
 #define RIS ESC "c"
 
-#define CUP(row,col) CSI TOSTRING(row) ";" TOSTRING(col) "H" 
+#define CUP(row,col) CSI TOSTRING(row) ";" TOSTRING(col) "H"
 #define SGR(...) GET_MACRO(__VA_ARGS__, SGR2, SGR1)(__VA_ARGS__)
 #define SGR1(a) CSI TOSTRING(a) "m"
 #define SGR2(a,b) CSI TOSTRING(a) ";" TOSTRING(b) "m"
@@ -33,10 +35,15 @@
 #define COLOURB_CYN CSI "46m"
 #define COLOURB_WIT CSI "47m"
 
-#define INFO COLOUR_RESET "[" COLOURF_GRN "INFO" COLOUR_RESET "] "
-#define WARN COLOUR_RESET "[" COLOURF_YEL "WARN" COLOUR_RESET "] "
-#define ERROR COLOUR_RESET "[" COLOURF_RED "ERROR" COLOUR_RESET "]"
-#define KLOG(level, message) kprint(level " " message "\n");
+#define INFO COLOUR_RESET "[" COLOURF_GRN "INFO" COLOUR_RESET "]  "
+#define WARN COLOUR_RESET "[" COLOURF_YEL "WARN" COLOUR_RESET "]  "
+#define ERROR COLOUR_RESET "[" COLOURF_RED "ERROR" COLOUR_RESET "] "
+
+#if DEBUG
+    #define KLOG(level, message) kprint(level message "\n");
+#else
+    #define KLOG(level, message)
+#endif
 
 void kput(char c);
 void kprint(char *s);

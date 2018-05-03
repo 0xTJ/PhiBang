@@ -2,8 +2,7 @@
 	.globl	_main
 
 init:
-    call    _main
-    ;call    _exit
+    jp      _main
 
 	;; Ordering of segments for the linker.
 	.area	_HOME

@@ -39,7 +39,7 @@ void init() {
 
     KLOG(INFO, "Adding devices");
     add_device(&acia_device, false, "acia");
-    add_device(&ramdisk_device, true, "ramdisk");
+    // add_device(&ramdisk_device, true, "ramdisk");
     add_device(&null_device, false, "null");
     add_device(&zero_device, false, "zero");
 

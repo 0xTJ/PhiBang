@@ -28,7 +28,14 @@ int open(const char *path/*, int oflag. ...*/) {
     fs_node_t *cur;
     int fd = 0;
     
-    cur = _traverse_path(proc_table[proc_cur].root, path);
+    if (path[0] == '/') {
+        cur = proc_table[proc_cur].root;
+        path++;
+    } else {
+        cur = proc_table[proc_cur].pwd;
+    }
+    
+    cur = _traverse_path(cur, path);
 
     if (cur == NULL)
         return -1;

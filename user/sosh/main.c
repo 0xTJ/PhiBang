@@ -1,10 +1,8 @@
 #include <unistd.h>
 
-const char rst_font[] = "\x1b[0m";
-const char clear_screen[] = "\x1b[2J";
-const char top_corner[] = "\x1b[H";
+const char test_str[] = "TEST EXEC\n";
 
 int main() {
-    write(1, "TEST EXEC", 8);
+    write(1, test_str, sizeof(test_str));
     return 0;
 }

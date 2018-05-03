@@ -18,11 +18,13 @@ REL = $(ASM_REL) $(C_REL)
 
 all: sosh.bin
 
+sosh.bin: sosh.ihx
+	makebin -s 65536 $< $@
+	mv $@ full_$@
+	dd if=full_$@ of=$@ bs=1 skip=40960 count=2048
+
 sosh.ihx: $(REL)
 	$(CC) $(CFLAGS) $^ -o $@
-
-%.bin: %.ihx
-	makebin -s 65536 $< $@
 
 %.rel: %.s
 	$(AS) $(ASFLAGS) $@ $<
@@ -31,4 +33,4 @@ sosh.ihx: $(REL)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.asm *.lst *.rel *.sym *.noi *.map *.lk *.bin
+	rm -f *.asm *.lst *.rel *.sym *.noi *.map *.lk *.bin *.ihx *.bin.bak
