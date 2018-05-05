@@ -14,16 +14,16 @@
 #include "../../initrd/initrd.img.h"
 
 const char welcome[] =
-"      √ç√ã√ç      √â¬ª  " "\n"
-"   √â√ç√ç√ç√é√ç√ç√ç¬ª   √ó√ó  " "\n"
-"  √â¬º   √ó   √à¬ª  √ó√ó  " "\n"
-"  √ó    √ó    √ó  √ó√ó  " "\n"
-"  √ó    √ó    √ó  √ó√ó  " "\n"
-"  √à¬ª   √ó   √â¬º  √à¬º  " "\n"
-"   √à√ç√ç√ç√é√ç√ç√ç¬º   √â¬ª  " "\n"
-"      √ç√ä√ç      √à¬º  " "\n"
+"      ÕÀÕ      …ª  " "\n"
+"   …ÕÕÕŒÕÕÕª   ««  " "\n"
+"  …º   «   »ª  ««  " "\n"
+"  «    «    «  ««  " "\n"
+"  «    «    «  ««  " "\n"
+"  »ª   «   …º  »º  " "\n"
+"   »ÕÕÕŒÕÕÕº   …ª  " "\n"
+"      Õ Õ      »º  " "\n"
 "                   " "\n"
-"   Welcome to √®!   " "\n"
+"   Welcome to Ë!   " "\n"
 "      by 0xTJ      " "\n"
 ;
 
@@ -43,17 +43,9 @@ void init() {
     add_device(&null_device, false, "null");
     add_device(&zero_device, false, "zero");
 
-    open("/dev/acia");
-    open("/dev/acia");
-    open("/dev/acia");
-    
-    {
-        fs_node_t *tmp = finddir_fs(proc_table[proc_cur].pwd, "sosh.bin");
-        read_fs(tmp, 0, 256, (void *)0xA000);
-        KLOG(INFO, "Starting binary");
-        ((void (*)())0xA000)();
-        KLOG(INFO, "Done binary");
-    }
+    open("/dev/acia", O_RDONLY);
+    open("/dev/acia", O_WRONLY|O_CREAT|O_APPEND);
+    open("/dev/acia", O_WRONLY|O_CREAT|O_APPEND);
     
     // {
         // int i = 0;
@@ -81,6 +73,14 @@ void init() {
             // i++;
         // }
     // }
+    
+    {
+        fs_node_t *tmp = finddir_fs(proc_table[proc_cur].pwd, "sosh.bin");
+        read_fs(tmp, 0, 0x0800, (void *)0xA000);
+        KLOG(INFO, "Starting binary");
+        ((void (*)())0xA000)();
+        KLOG(INFO, "Done binary");
+    }
 }
 
 extern struct block_meta heap;
@@ -97,11 +97,11 @@ void main() {
     heap.next = NULL;
     heap.free = true;
 
-    kprint(RIS);
-    // {uint8_t i; for (i = 0; i < 0x400; i++) kput('\0');}
-    // kprint("\n\n");
-    // kprint(welcome);
-    // kprint("\n\n");
+    // kprint(RIS);
+    // {size_t i; for (i = 0; i < 0x800; i++) kput('\0');}
+    kprint("\n\n");
+    kprint(welcome);
+    kprint("\n\n");
     KLOG(INFO, "Starting PhiBang");
 
     proc_init_enter1(init);

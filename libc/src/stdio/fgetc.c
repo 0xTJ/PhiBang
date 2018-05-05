@@ -1,8 +1,13 @@
 #include <stdio.h>
-
-FILE _io_files[FOPEN_MAX];
+#include <unistd.h>
 
 int fgetc(FILE *stream) {
-    stream;
-    return 0;
+    unsigned char c;
+    size_t res = read(stream->fd, &c, 1);
+    if (res == 0) {
+        stream->is_eof = EOF;
+        return EOF;
+    } else {
+        return c;
+    }
 }

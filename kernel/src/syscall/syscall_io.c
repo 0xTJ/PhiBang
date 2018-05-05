@@ -1,5 +1,7 @@
 #include <unistd.h>
+#include <fcntl.h>
 #include "proc.h"
+#include "kio.h"
 #include "fs.h"
 
 static fs_node_t *_traverse_path(fs_node_t *cur, const char *path) {
@@ -24,19 +26,11 @@ static fs_node_t *_traverse_path(fs_node_t *cur, const char *path) {
     return cur;
 }
 
-int open(const char *path/*, int oflag. ...*/) {
+int open(const char *path, int oflag/*, ...*/) {
     fs_node_t *cur;
     int fd = 0;
     
-    if (path[0] == '/') {
-        cur = proc_table[proc_cur].root;
-        path++;
-    } else {
-        cur = proc_table[proc_cur].pwd;
-    }
-    
-    cur = _traverse_path(cur, path);
-
+    cur = _traverse_path(fs_root, path);
     if (cur == NULL)
         return -1;
     
@@ -52,7 +46,7 @@ int open(const char *path/*, int oflag. ...*/) {
         return -1;
     
     proc_table[proc_cur].ofile_tab[fd] = kmalloc(sizeof(struct ofile));
-    proc_table[proc_cur].ofile_tab[fd]->mode = MODE_READ_WRITE;
+    proc_table[proc_cur].ofile_tab[fd]->oflag = oflag;
     proc_table[proc_cur].ofile_tab[fd]->offset = 0;
     proc_table[proc_cur].ofile_tab[fd]->node = cur;
     
@@ -75,52 +69,44 @@ size_t read(int fildes, void *buffer, size_t nbyte) {
     if (filep == NULL)
         return 0;
 
-    switch (filep->mode) {
-    case MODE_READ:
-    case MODE_READ_WRITE:
-        {
-            fs_node_t *node = filep->node;
-            size_t res;
+    if (filep->oflag & O_ACCMODE & O_RDWR || filep->oflag & O_ACCMODE & O_RDONLY) {
+        fs_node_t *node = filep->node;
+        size_t res;
 
-            if (node == NULL)
-                return 0;
+        if (node == NULL)
+            return 0;
 
-            res = read_fs(node, filep->offset, nbyte, buffer);
-            if (filep->offset > 0)
-                filep->offset += res;
-            return res;
-        }
-    default:
+        res = read_fs(node, filep->offset, nbyte, buffer);
+        if (filep->offset > 0)
+            filep->offset += res;
+        return res;
+    } else {
         return 0;
     }
 }
 
 ssize_t write(int fildes, const void *buffer, size_t nbyte) {
     struct ofile *filep;
-
+    
     if (fildes < 0 || fildes >= RLIMIT_NOFILE || nbyte == 0 || buffer == NULL)
-        return 0;
+        return -1;
 
     filep = proc_table[proc_cur].ofile_tab[fildes];
     if (filep == NULL)
-        return 0;
+        return -1;
 
-    switch (filep->mode) {
-    case MODE_WRITE:
-    case MODE_READ_WRITE:
-        {
-            fs_node_t *node = filep->node;
-            size_t res;
+    if (filep->oflag & O_ACCMODE & O_RDWR || filep->oflag & O_ACCMODE & O_WRONLY) {
+        fs_node_t *node = filep->node;
+        size_t res;
 
-            if (node == NULL)
-                return 0;
+        if (node == NULL)
+            return 0;
 
-            res = write_fs(node, filep->offset, nbyte, buffer);
-            if (filep->offset > 0)
-                filep->offset += res;
-            return res;
-        }
-    default:
+        res = write_fs(node, filep->offset, nbyte, buffer);
+        if (filep->offset > 0)
+            filep->offset += res;
+        return res;
+    } else {
         return -1;
     }
 }

@@ -8,10 +8,8 @@
 
 #define TASK_MAX (1 + 1)
 
-enum file_mode { MODE_NONE = 0, MODE_READ, MODE_WRITE, MODE_READ_WRITE };
-
 struct ofile {
-    enum file_mode mode;
+    int oflag;
     off_t offset;
     fs_node_t *node;
 };

@@ -2,6 +2,7 @@
 	.globl	_main
 
 init:
+    call    gsinit
     jp      _main
 
 	;; Ordering of segments for the linker.

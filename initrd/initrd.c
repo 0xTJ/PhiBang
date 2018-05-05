@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#define FILE_COUNT 64
+#define FILE_COUNT 2
 
 struct initrd_header {
    uint32_t nfiles;
@@ -27,7 +27,7 @@ int main(char argc, char **argv) {
        printf("writing file %s->%s at 0x%x\n", argv[i*2+1], argv[i*2+2], off);
        strcpy(headers[i].name, argv[i*2+2]);
        headers[i].offset = off;
-       FILE *stream = fopen(argv[i*2+1], "r");
+       FILE *stream = fopen(argv[i*2+1], "rb");
        if(stream == 0) {
          printf("Error: file not found: %s\n", argv[i*2+1]);
          return 1;
@@ -39,14 +39,14 @@ int main(char argc, char **argv) {
        headers[i].magic = 0xBF;
    }
 
-   FILE *wstream = fopen("./initrd.img", "w");
+   FILE *wstream = fopen("./initrd.img", "wb");
    unsigned char *data = (unsigned char *)malloc(off);
    fwrite(&nheaders, sizeof(int), 1, wstream);
    fwrite("", sizeof(uint8_t), 1, wstream);
    fwrite(headers, sizeof(struct initrd_file_header), FILE_COUNT, wstream);
 
    for(i = 0; i < nheaders; i++) {
-     FILE *stream = fopen(argv[i*2+1], "r");
+     FILE *stream = fopen(argv[i*2+1], "rb");
      unsigned char *buf = (unsigned char *)malloc(headers[i].length);
      fread(buf, 1, headers[i].length, stream);
      fwrite(buf, 1, headers[i].length, wstream);

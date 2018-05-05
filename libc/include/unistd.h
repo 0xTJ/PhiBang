@@ -37,7 +37,7 @@ int          close(int);
 pid_t        fork(void);
 pid_t        getpid(void);
 pid_t        getppid(void);
-ssize_t      read(int, void *, size_t);
+size_t       read(int, void *, size_t);
 ssize_t      write(int, const void *, size_t);
 
 #endif

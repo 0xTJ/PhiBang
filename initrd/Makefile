@@ -3,7 +3,7 @@ CC = gcc
 FILES = $(wildcard initrd/*)
 FILES_PLUS_DEST = $(foreach F, $(patsubst initrd/%, %, $(FILES)),initrd/$(F) $(F))
 
-.PHONY: all clean initrd.img
+.PHONY: all clean 
 
 all: initrd.img.h
 

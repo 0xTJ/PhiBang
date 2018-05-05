@@ -10,6 +10,7 @@ fs_node_t *initrd_root;             // Our root directory node.
 fs_node_t *initrd_dev;              // We also add a directory node for /dev, so we can mount devfs later on.
 fs_node_t *root_nodes;              // List of file nodes.
 size_t nroot_nodes;                    // Number of file nodes.
+off_t global_offset;
 
 static size_t initrd_read(fs_node_t *node, off_t offset, size_t size, uint8_t *buffer) {
     initrd_file_header_t header; // Optimise to use pointer maybe?
@@ -18,7 +19,7 @@ static size_t initrd_read(fs_node_t *node, off_t offset, size_t size, uint8_t *b
         return 0;
     if (offset + size > header.length)
         size = header.length - offset;
-    memcpy(buffer, (uint8_t *)(header.offset + offset), size);
+    memcpy(buffer, (uint8_t *)(header.offset + global_offset + offset), size);
 
     return size;
 }
@@ -94,10 +95,7 @@ fs_node_t *initialise_initrd(size_t location) {
       // For every file...
     for (i = 0; i < initrd_header->nfiles; i++)
     {
-        // Edit the file's header - currently it holds the file offset
-        // relative to the start of the ramdisk. We want it relative to the start
-        // of memory.
-        file_headers[i].offset += location;
+        global_offset = location;
         // Create a new file node.
         strcpy(root_nodes[i].name, file_headers[i].name);
         root_nodes[i].mask = root_nodes[i].uid = root_nodes[i].gid = 0;

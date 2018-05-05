@@ -10,8 +10,3 @@ syscall::
     ld      d, (hl)
     push    de
     reti
-
-    .area   _DATA
-
-tmp:
-    .blkb    2
