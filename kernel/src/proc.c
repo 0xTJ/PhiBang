@@ -13,7 +13,7 @@ volatile void *tmp_stack_pointer;
 volatile int tmp_pid;
 volatile void *tmp_stack;
 volatile uint8_t tmp_stack_num;
-volatile void *kernel_stack_pointer;
+extern void *kern_sp;
 
 extern unsigned char proc_mem[RLIMIT_AS];
 
@@ -48,7 +48,7 @@ void proc_init_enter1(void (*entry)(void)) {
     push    de
     push    hl
     push    iy
-    ld      (_kernel_stack_pointer), sp
+    ld      (kern_sp), sp
 
     ld      sp, (_tmp_stack_pointer)
     ld      hl, #00001$
@@ -57,7 +57,7 @@ void proc_init_enter1(void (*entry)(void)) {
     jp     (hl)
 
 00001$:
-    ld      sp, (_kernel_stack_pointer)
+    ld      sp, (kern_sp)
     pop     iy
     pop     hl
     pop     de
@@ -73,49 +73,14 @@ void proc_post_setup(fs_node_t *root_node) {
     proc_table[1].pwd = root_node;
 }
 
-void enter_kernel(void *stack, uint8_t stack_num) __critical {
-    __asm
-    push    af
-    push    bc
-    push    de
-    push    hl
-    push    iy
-    ld      (_tmp_stack_pointer), sp
-    __endasm;
-
+void save_curr_sp(void *stack, uint8_t stack_num) __critical {
     proc_table[proc_cur].stack_pointer = tmp_stack_pointer;
-
-    __asm
-    ld      sp, (_kernel_stack_pointer)
-    pop     iy
-    pop     hl
-    pop     de
-    pop     bc
-    pop     af
-    __endasm;
 }
 
-void exit_kernel() __critical {
-    if (proc_table[proc_cur].pid != proc_cur)
-        return;
-    
-    __asm
-    push    af
-    push    bc
-    push    de
-    push    hl
-    push    iy
-    ld      (_kernel_stack_pointer), sp
-    __endasm;
-
+void load_curr_sp() __critical {
     tmp_stack_pointer = proc_table[proc_cur].stack_pointer;
 
     __asm
     ld      sp, (_tmp_stack_pointer)
-    pop     iy
-    pop     hl
-    pop     de
-    pop     bc
-    pop     af
     __endasm;
 }

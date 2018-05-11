@@ -1,4 +1,5 @@
-        .area	_CODE
+        .module _chdir
+        .area   _CODE
 
 _chdir::
         ld  hl, #01

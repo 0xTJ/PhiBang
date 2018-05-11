@@ -1,5 +1,4 @@
 #include "dev/acia.h"
-#include <stddef.h>
 
 struct char_device acia_device = {
     acia_init,

@@ -1,4 +1,5 @@
-        .area	_CODE
+        .module _read
+        .area   _CODE
 
 _read::
         ld  hl, #05

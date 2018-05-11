@@ -1,5 +1,4 @@
 #include <stdbool.h>
-#include <stdio.h>
 #include <fcntl.h>
 #include "proc.h"
 #include "dev.h"
@@ -99,8 +98,8 @@ void main() {
 
     // kprint(RIS);
     // {size_t i; for (i = 0; i < 0x800; i++) kput('\0');}
-    kprint("\n\n");
-    kprint(welcome);
+    // kprint("\n\n");
+    // kprint(welcome);
     kprint("\n\n");
     KLOG(INFO, "Starting PhiBang");
 

@@ -1,4 +1,5 @@
-        .area	_CODE
+        .module _getpid
+        .area   _CODE
 
 _getpid::
         ld  hl, #03

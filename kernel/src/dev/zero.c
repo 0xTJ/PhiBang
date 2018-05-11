@@ -1,5 +1,5 @@
 #include "dev/zero.h"
-#include <stdio.h>
+#include <stddef.h>
 
 struct char_device zero_device = {
     NULL,
