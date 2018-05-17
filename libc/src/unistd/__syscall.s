@@ -6,8 +6,8 @@
 ;   Passes address to parameter stack address and syscall number in HL and A respectively
 ;
 ;   Entry registers
-;       BC - Parameters length
 ;       A - Syscall number
+;       BC - Parameters length
 ;
 ;   Return registers
 ;       HL - 0 on success, -1 on error

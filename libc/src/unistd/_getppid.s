@@ -2,5 +2,6 @@
         .area   _CODE
 
 _getppid::
-        ld  hl, #04
-        jp  __syscall
+        ld      a, #0
+        ld      bc, #0x0006
+        jp      __syscall

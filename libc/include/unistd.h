@@ -32,8 +32,10 @@ typedef unsigned short ssize_t;
 typedef unsigned short pid_t;
 #endif
 
+void         _exit(int);
 int          chdir(const char *);
 int          close(int);
+int          execvp(const char *, char *const []);
 pid_t        fork(void);
 pid_t        getpid(void);
 pid_t        getppid(void);

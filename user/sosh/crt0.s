@@ -3,7 +3,11 @@
 
 init:
     call    gsinit
-    jp      _main
+    call    _main
+exit:
+    ld      hl, #0x00
+    jp      __syscall
+    jr      (exit)
 
 	;; Ordering of segments for the linker.
 	.area	_HOME

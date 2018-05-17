@@ -2,5 +2,6 @@
         .area   _CODE
 
 _chdir::
-        ld  hl, #01
-        jp  __syscall
+        ld      a, #0x02
+        ld      bc, #0x0006
+        jp      __syscall

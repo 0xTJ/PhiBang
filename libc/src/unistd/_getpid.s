@@ -2,5 +2,6 @@
         .area   _CODE
 
 _getpid::
-        ld  hl, #03
-        jp  __syscall
+        ld      a, #0
+        ld      bc, #0x0006
+        jp      __syscall

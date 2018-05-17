@@ -2,7 +2,7 @@ CC = sdcc
 AS = sdasz80
 
 ASFLAGS = -plosgffw
-CFLAGS = -mz80 --code-loc 0xA000 --data-loc 0xA800 --nostdinc --nostdlib --no-std-crt0 --std-sdcc99 --Werror
+CFLAGS = -mz80 --code-loc 0xA000 --data-loc 0xA800 --nostdinc --nostdlib --no-std-crt0 --std-sdcc11 --Werror
 
 CFLAGS := $(CFLAGS) -I../../libc/include -L../../libc -llibc
 
@@ -33,4 +33,4 @@ sosh.ihx: $(REL)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.asm *.lst *.rel *.sym *.noi *.map *.lk *.bin *.ihx *.bin.bak
+	rm -f *.asm *.lst *.rel *.sym *.noi *.map *.lk *.bin *.ihx *.bin.bak *.rst

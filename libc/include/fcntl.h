@@ -11,6 +11,6 @@
 #define O_SEARCH (0b101)
 #define O_WRONLY (0b100)
 
-int open(const char *, int/*, ...*/);
+int open(const char *, int, ...);
 
 #endif

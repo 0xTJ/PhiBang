@@ -26,7 +26,7 @@ static fs_node_t *_traverse_path(fs_node_t *cur, const char *path) {
     return cur;
 }
 
-int open(const char *path, int oflag/*, ...*/) {
+int open(const char *path, int oflag, ...) {
     fs_node_t *cur;
     int fd = 0;
     

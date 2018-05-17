@@ -12,39 +12,9 @@
 ;
 
 syscall::
+    pop     de
+    ld      (_sysc_ret), de
     call    enter_kernel
-
-    push    af
-    push    bc
-    push    de
-    push    hl
-    push    hl
-    ld      hl, #'['
-    push    hl
-    call    _kput
-    pop     hl
-    call    _kput_uint16
-    pop     hl
-    pop     hl
-    pop     de
-    pop     bc
-    pop     af
-
-    push    af
-    push    bc
-    push    de
-    push    hl
-    push    bc
-    ld      hl, #']'
-    push    hl
-    call    _kput
-    pop     hl
-    call    _kput_uint16
-    pop     bc
-    pop     hl
-    pop     de
-    pop     bc
-    pop     af
 
 ;; TODO: check for bc == 0
     add     hl, bc
@@ -57,46 +27,15 @@ syscall::
     ld      bc, (buff)
     inc     de
     ex      de, hl
+    ld      (buff), sp
     ld      sp, hl
 
     ld      hl, #_syscalls
     ld      c, a
     ld      b, #0
 
-    push    af
-    push    bc
-    push    de
-    push    hl
-    push    bc
-    ld      hl, #'{'
-    push    hl
-    call    _kput
-    pop     hl
-    call    _kput_uint16
-    pop     bc
-    pop     hl
-    pop     de
-    pop     bc
-    pop     af
-
     add     hl, bc
     add     hl, bc          ; Address of address of syscall function in HL
-
-    push    af
-    push    bc
-    push    de
-    push    hl
-    push    hl
-    ld      hl, #'}'
-    push    hl
-    call    _kput
-    pop     hl
-    call    _kput_uint16
-    pop     hl
-    pop     hl
-    pop     de
-    pop     bc
-    pop     af
 
     ld      e, (hl)
     inc     hl
@@ -106,19 +45,20 @@ syscall::
     ex      de, hl
     jp      (hl)            ; to syscall function
 
-;; RESTORE STACK HERE
-
 10000$:
-
+    ld      sp, (buff)
+    
     call    exit_kernel
+    ld      de, (_sysc_ret)
+    push    de
 
     reti
 
 enter_kernel::
     ld      (buff), hl
     pop     hl
-    ld      (curr_sp), sp
-    ld      sp, (kern_sp)
+    ld      (_curr_sp), sp
+    ld      sp, (_kern_sp)
     push    hl
     ld      hl, (buff)
     ret
@@ -126,8 +66,8 @@ enter_kernel::
 exit_kernel::
     ld      (buff), hl
     pop     hl
-    ld      (kern_sp), sp
-    ld      sp, (curr_sp)
+    ld      (_kern_sp), sp
+    ld      sp, (_curr_sp)
     push    hl
     ld      hl, (buff)
     ret
@@ -135,7 +75,6 @@ exit_kernel::
     .area _DATA
 
 buff:       .blkb   2
-
-curr_sp::   .blkb   2
-kern_sp::   .blkb   2
-buff_hl:    .blkb   2
+_curr_sp::   .blkb   2
+_kern_sp::   .blkb   2
+_sysc_ret:: .blkb   2

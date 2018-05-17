@@ -24,6 +24,7 @@ static size_t devfs_read(fs_node_t *node, off_t offset, size_t size, uint8_t *bu
         }
         return i;
     case FS_BLOCKDEVICE:
+        offset;
     }
     return 0;
 }
@@ -34,7 +35,6 @@ static ssize_t devfs_write(fs_node_t *node, off_t offset, size_t size, uint8_t *
     case FS_CHARDEVICE:
         if (((struct char_device *)dev_tab[node->inode].dev_desc)->put == NULL)
             return -1;
-
         while (i < size) {
             if (((struct char_device *)dev_tab[node->inode].dev_desc)->put(*buffer++) < 0)
                 return -1;
@@ -42,6 +42,7 @@ static ssize_t devfs_write(fs_node_t *node, off_t offset, size_t size, uint8_t *
         }
         return i;
     case FS_BLOCKDEVICE:
+        offset;
     }
     return -1;
 }
@@ -61,6 +62,9 @@ static struct dirent *devfs_readdir(fs_node_t *node, uint32_t index) {
 static fs_node_t *devfs_finddir(fs_node_t *node, char *name) {
     size_t i;
 
+    if (node != devfs_root)
+        return NULL;
+
     for (i = 0; i < DEVICE_COUNT; i++) {
         if (dev_tab[i].type == NO_DEV)
             continue;
@@ -73,7 +77,7 @@ static fs_node_t *devfs_finddir(fs_node_t *node, char *name) {
 void _devfs_add(size_t index, bool is_block, char *name) {
     if (is_block)
         KLOG(WARN, "Block devices not yet implemented");
-    
+
     dev_root_nodes[index] = kmalloc(sizeof(fs_node_t));
     strcpy(dev_root_nodes[index]->name, name);
     dev_root_nodes[index]->mask = dev_root_nodes[index]->uid = dev_root_nodes[index]->gid = 0;

@@ -2,5 +2,6 @@
         .area   _CODE
 
 _read::
-        ld  hl, #05
+        ld      a, #0x05
+        ld      bc, #0x0006
         jp  __syscall

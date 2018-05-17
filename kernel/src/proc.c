@@ -48,7 +48,7 @@ void proc_init_enter1(void (*entry)(void)) {
     push    de
     push    hl
     push    iy
-    ld      (kern_sp), sp
+    ld      (_kern_sp), sp
 
     ld      sp, (_tmp_stack_pointer)
     ld      hl, #00001$
@@ -57,7 +57,7 @@ void proc_init_enter1(void (*entry)(void)) {
     jp     (hl)
 
 00001$:
-    ld      sp, (kern_sp)
+    ld      sp, (_kern_sp)
     pop     iy
     pop     hl
     pop     de

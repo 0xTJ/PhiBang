@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include "proc.h"
 #include "dev.h"
 #include "dev/acia.h"
@@ -74,11 +75,19 @@ void init() {
     // }
     
     {
-        fs_node_t *tmp = finddir_fs(proc_table[proc_cur].pwd, "sosh.bin");
-        read_fs(tmp, 0, 0x0800, (void *)0xA000);
+        // int fd = open("/sosh.bin", O_RDONLY);
+        // read(fd, (void *)0xA000, 0x0800);
+        __asm
+        call (enter_kernel)
+        __endasm;
         KLOG(INFO, "Starting binary");
-        ((void (*)())0xA000)();
-        KLOG(INFO, "Done binary");
+        execvp("/sosh.bin", NULL);
+        __asm
+        call (exit_kernel)
+        ld      hl, #0xA000
+        jp      (hl)
+        __endasm;
+        KLOG(INFO, "Failed binary");
     }
 }
 
