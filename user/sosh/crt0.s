@@ -17,6 +17,7 @@ exit:
 	.area   _GSFINAL
 
 	.area	_DATA
+    .ds 240
 	.area	_INITIALIZED
 	.area	_BSEG
 	.area   _BSS

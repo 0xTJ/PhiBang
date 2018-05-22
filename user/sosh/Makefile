@@ -2,7 +2,7 @@ CC = sdcc
 AS = sdasz80
 
 ASFLAGS = -plosgffw
-CFLAGS = -mz80 --code-loc 0xA000 --data-loc 0xA800 --nostdinc --nostdlib --no-std-crt0 --std-sdcc11 --Werror
+CFLAGS = -mz80 --nostdinc --nostdlib --no-std-crt0 --std-sdcc11 --Werror
 
 CFLAGS := $(CFLAGS) -I../../libc/include -L../../libc -llibc
 
@@ -16,15 +16,23 @@ REL = $(ASM_REL) $(C_REL)
 
 .PHONY: all clean
 
-all: sosh.bin
+all: sosh_0000.bin sosh_8000.bin
 
-sosh.bin: sosh.ihx
+sosh_0000.bin: sosh_0000.ihx
 	makebin -s 65536 $< $@
 	mv $@ full_$@
-	dd if=full_$@ of=$@ bs=1 skip=40960 count=2048
+	dd if=full_$@ of=$@ bs=1 skip=0 count=2048
 
-sosh.ihx: $(REL)
-	$(CC) $(CFLAGS) $^ -o $@
+sosh_8000.bin: sosh_8000.ihx
+	makebin -s 65536 $< $@
+	mv $@ full_$@
+	dd if=full_$@ of=$@ bs=1 skip=513 count=2048
+
+sosh_0000.ihx: $(REL)
+	$(CC) $(CFLAGS) --code-loc 0x0000 --data-loc 0x8000 $^ -o $@
+
+sosh_8000.ihx: $(REL)
+	$(CC) $(CFLAGS) --code-loc 0x0201 --data-loc 0x8504 $^ -o $@
 
 %.rel: %.s
 	$(AS) $(ASFLAGS) $@ $<

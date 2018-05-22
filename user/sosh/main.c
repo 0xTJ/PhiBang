@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <string.h>
 
+short test;
+
 void getString(char *buffer, size_t sz) {
     size_t i = 0;
     uint8_t stop = 0;
