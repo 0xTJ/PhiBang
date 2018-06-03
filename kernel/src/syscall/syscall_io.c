@@ -4,7 +4,7 @@
 #include "kio.h"
 #include "fs.h"
 
-static fs_node_t *_traverse_path(fs_node_t *cur, const char *path) {
+fs_node_t *_traverse_path(fs_node_t *cur, const char *path) {
     do {
         if (cur->flags & FS_MOUNTPOINT)
             cur = cur->ptr;

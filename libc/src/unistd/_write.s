@@ -1,7 +1,7 @@
-    .module _write
-    .area	_CODE
+        .module _write
+        .area	_CODE
 
 _write::
-        ld      a, #0x06
+        ld      a, #0x23
         ld      bc, #0x0006
         jp      __syscall

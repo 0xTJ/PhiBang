@@ -5,8 +5,7 @@ init:
     call    gsinit
     call    _main
 exit:
-    ld      hl, #0x00
-    jp      __syscall
+    call    (__exit)
     jr      (exit)
 
 	;; Ordering of segments for the linker.

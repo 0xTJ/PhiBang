@@ -16,7 +16,18 @@ syscall::
     ld      (_sysc_ret), de
     call    enter_kernel
 
-;; TODO: check for bc == 0
+    push    af              ; Do 0 param length check
+    ld	    a, b
+	or	    a, c
+
+	jr	    Z, no_params
+    pop     af
+    jr      copy_params
+no_params:
+    pop     af
+    jr      done_params
+
+copy_params:
     add     hl, bc
     dec     hl
     ld      (buff), sp
@@ -25,11 +36,13 @@ syscall::
     ld      (buff), bc
     lddr
     ld      bc, (buff)
+
     inc     de
     ex      de, hl
     ld      (buff), sp
     ld      sp, hl
 
+done_params:
     ld      hl, #_syscalls
     ld      c, a
     ld      b, #0
@@ -47,7 +60,7 @@ syscall::
 
 10000$:
     ld      sp, (buff)
-    
+
     call    exit_kernel
     ld      de, (_sysc_ret)
     push    de

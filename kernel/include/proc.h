@@ -16,14 +16,13 @@ struct ofile {
 
 struct proc_desc {
     pid_t pid;
-    
-    size_t stack_size;
-    void *stack_bottom;
+
+    void *mem;
     void *stack_pointer;
-    
+
     fs_node_t *root;
     fs_node_t *pwd;
-    
+
     struct ofile *ofile_tab[RLIMIT_NOFILE];
 };
 

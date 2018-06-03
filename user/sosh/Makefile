@@ -16,7 +16,10 @@ REL = $(ASM_REL) $(C_REL)
 
 .PHONY: all clean
 
-all: sosh_0000.bin sosh_8000.bin
+all: sosh.bin
+
+sosh.bin: sosh_0000.bin sosh_8000.bin
+	python deltrelator.py $^ $@
 
 sosh_0000.bin: sosh_0000.ihx
 	makebin -s 65536 $< $@

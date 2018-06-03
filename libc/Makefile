@@ -1,6 +1,6 @@
 CC = sdcc
 AS = sdasz80
-AR = sdar
+AR = "C:\Users\Thomas Jager\Development\PhiBang\libc\src\sdar.exe"
 
 ASFLAGS = -plosgffw
 CFLAGS = -mz80 -c --nostdinc --nostdlib --no-std-crt0 --std-sdcc99 --Werror

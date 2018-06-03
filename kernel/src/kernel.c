@@ -46,49 +46,28 @@ void init() {
     open("/dev/acia", O_RDONLY);
     open("/dev/acia", O_WRONLY|O_CREAT|O_APPEND);
     open("/dev/acia", O_WRONLY|O_CREAT|O_APPEND);
-    
-    // {
-        // int i = 0;
-        // struct dirent *node = NULL;
-        // while ( (node = readdir_fs(proc_table[proc_cur].pwd, i)) != NULL) {
-            // fs_node_t *fsnode = finddir_fs(proc_table[proc_cur].pwd, node->d_name);
 
-            // kprint("Found file ");
-            // kprint(node->d_name);
+    KLOG(INFO, "About to enter kernel");
 
-            // if ((fsnode->flags & (uint32_t)0x7) == FS_DIRECTORY) {
-                // kprint("\n\t(directory)\n");
-            // } else {
-                // size_t j;
-                // char buf[256];
-                // size_t sz;
-
-                // sz = read_fs(fsnode, 0, 256, buf);
-                // kprint("\n\t contents: \"");
-                // for (j = 0; j < sz; j++)
-                    // kput(buf[j]);
-
-                // kprint("\"\n");
-            // }
-            // i++;
-        // }
-    // }
-    
-    {
-        // int fd = open("/sosh.bin", O_RDONLY);
-        // read(fd, (void *)0xA000, 0x0800);
-        __asm
-        call (enter_kernel)
-        __endasm;
-        KLOG(INFO, "Starting binary");
-        execvp("/sosh.bin", NULL);
-        __asm
-        call (exit_kernel)
-        ld      hl, #0xA000
-        jp      (hl)
-        __endasm;
-        KLOG(INFO, "Failed binary");
-    }
+    __asm
+    call (enter_kernel)
+    __endasm;
+    KLOG(INFO, "Entered kernel");
+    KLOG(INFO, "Loading binary");
+    execvp("/sosh.bin", NULL);
+    KLOG(INFO, "Loaded binary");
+    KLOG(INFO, "About to exit kernel");
+    __asm
+    call (exit_kernel);
+    __endasm;
+    KLOG(INFO, "Exited kernel");
+    KLOG(INFO, "About to jump into user");
+    __asm
+    ld      hl, #0xA000
+    jp      (hl)
+    __endasm;
+    KLOG(INFO, "Failed binary");
+    // Never try to return here. The previous stack has been obliterated, and you'll return on an unknown value.
 }
 
 extern struct block_meta heap;

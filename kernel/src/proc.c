@@ -22,8 +22,7 @@ void proc_init_enter1(void (*entry)(void)) {
 
     for (i = 0; i < TASK_MAX; i++) {
         proc_table[i].pid = 0;
-        proc_table[i].stack_size = 0;
-        proc_table[i].stack_bottom = NULL;
+        proc_table[i].mem = NULL;
         proc_table[i].stack_pointer = NULL;
         proc_table[i].root = NULL;
         proc_table[i].pwd = NULL;
@@ -33,8 +32,7 @@ void proc_init_enter1(void (*entry)(void)) {
 
     proc_table[1].pid = 1;
 
-    proc_table[1].stack_size = RLIMIT_STACK;
-    proc_table[1].stack_bottom = proc_mem + RLIMIT_AS - RLIMIT_STACK;
+    proc_table[1].mem = proc_mem;
     proc_table[1].stack_pointer = proc_mem + RLIMIT_AS;
 
     proc_cur = 1;
@@ -73,7 +71,7 @@ void proc_post_setup(fs_node_t *root_node) {
     proc_table[1].pwd = root_node;
 }
 
-void save_curr_sp(void *stack, uint8_t stack_num) __critical {
+void save_curr_sp() __critical {
     proc_table[proc_cur].stack_pointer = tmp_stack_pointer;
 }
 

@@ -1,7 +1,7 @@
 #ifndef _INCLUDE_KIO_H
 #define _INCLUDE_KIO_H
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -48,5 +48,43 @@
 void kput(char c);
 void kprint(char *s);
 void kput_uint16(unsigned short n);
+
+struct _regStorage {
+    unsigned char sp_l;
+    unsigned char sp_h;
+    unsigned char a;
+    unsigned char b;
+    unsigned char c;
+    unsigned char d;
+    unsigned char e;
+    unsigned char h;
+    unsigned char l;
+} extern _tmp_reg_storage;
+
+#define KPRINT_REGS \
+__asm \
+ld      (__tmp_reg_storage), sp \
+push    iy \
+ld      iy, #__tmp_reg_storage \
+ld      2(iy), a \
+ld      3(iy), b \
+ld      4(iy), c \
+ld      5(iy), d \
+ld      6(iy), e \
+ld      7(iy), h \
+ld      8(iy), l \
+pop     iy \
+__endasm; \
+kprint("A0: "); \
+kput_uint16(_tmp_reg_storage.a << 8); \
+kprint("\nBC: "); \
+kput_uint16((_tmp_reg_storage.b << 8) + _tmp_reg_storage.c); \
+kprint("\nDE: "); \
+kput_uint16((_tmp_reg_storage.d << 8) + _tmp_reg_storage.e); \
+kprint("\nHL: "); \
+kput_uint16((_tmp_reg_storage.h << 8) + _tmp_reg_storage.l); \
+kprint("\nSP: "); \
+kput_uint16((_tmp_reg_storage.sp_h << 8) + _tmp_reg_storage.sp_l); \
+kprint("\n");
 
 #endif

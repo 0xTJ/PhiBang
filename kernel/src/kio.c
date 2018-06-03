@@ -1,6 +1,8 @@
 #include "kio.h"
 #include "dev/acia.h"
 
+struct _regStorage _tmp_reg_storage;
+
 void kput(char c) {
     acia_put(c);
 }
