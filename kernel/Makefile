@@ -38,7 +38,8 @@ src/kernel.rel: src/kernel.c ../initrd/initrd.img.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f bin/*
+	md
+	 -f bin/*
 	rm -f src/*.asm src/*.lst src/*.rel src/*.sym
 	rm -f src/*/*.asm src/*/*.lst src/*/*.rel src/*/*.sym
 	rm -f src/*/*/*.asm src/*/*/*.lst src/*/*/*.rel src/*/*/*.sym

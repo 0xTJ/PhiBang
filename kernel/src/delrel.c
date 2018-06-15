@@ -17,7 +17,7 @@ void processDrl(struct drlHeader *header, struct drlEntry entries[], unsigned ch
                 *(unsigned short *)(code_loc + entries[i].position) += (size_t)code_loc;
                 break;
             case 2:
-                *(unsigned short *)(code_loc + entries[i].position) += (size_t)data_loc;
+                *(unsigned short *)(code_loc + entries[i].position) += (size_t)data_loc - 0x8000;
                 break;
             default:
                 // Handle bad file

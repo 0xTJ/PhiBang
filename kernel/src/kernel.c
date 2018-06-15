@@ -11,6 +11,7 @@
 #include "fs/devfs.h"
 #include "fs/initrd.h"
 #include "kio.h"
+#include "sched.h"
 #include "../../initrd/initrd.img.h"
 
 const char welcome[] =
@@ -71,6 +72,9 @@ void init() {
 }
 
 extern struct block_meta heap;
+extern void *sysc_ret;
+extern void *curr_sp;
+void bootstrap_exec(void);
 
 void main() {
     __asm
@@ -92,6 +96,8 @@ void main() {
     KLOG(INFO, "Starting PhiBang");
 
     proc_init_enter1(init);
-
-    KLOG(INFO, "Halting");
+    proc_cur = 1;
+    sysc_ret = init;
+    curr_sp = proc_table[1].stack_pointer;
+    bootstrap_exec();
 }

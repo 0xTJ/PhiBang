@@ -41,7 +41,7 @@
 	.org	0x18
 	reti
 	.org	0x20
-	reti
+	jp      0x20
 	.org	0x28
 	reti
 	.org	0x30

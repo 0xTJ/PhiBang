@@ -60,7 +60,7 @@ done_params:
 
 10000$:
     ld      sp, (buff)
-
+_bootstrap_exec::
     call    exit_kernel
     ld      de, (_sysc_ret)
     push    de

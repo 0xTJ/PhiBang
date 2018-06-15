@@ -35,8 +35,6 @@ void proc_init_enter1(void (*entry)(void)) {
     proc_table[1].mem = proc_mem;
     proc_table[1].stack_pointer = proc_mem + RLIMIT_AS;
 
-    proc_cur = 1;
-
     tmp_entry = entry;
     tmp_stack_pointer = proc_table[1].stack_pointer;
 
@@ -49,12 +47,12 @@ void proc_init_enter1(void (*entry)(void)) {
     ld      (_kern_sp), sp
 
     ld      sp, (_tmp_stack_pointer)
-    ld      hl, #00001$
+    ld      hl, #0x0020
     push    hl
     ld      hl, (_tmp_entry)
-    jp     (hl)
+    push    hl
+    ld      (_tmp_stack_pointer), sp
 
-00001$:
     ld      sp, (_kern_sp)
     pop     iy
     pop     hl
@@ -63,7 +61,8 @@ void proc_init_enter1(void (*entry)(void)) {
     pop     af
     __endasm;
 
-    proc_table[1].pid = 0;
+    proc_table[1].stack_pointer = tmp_stack_pointer;
+    proc_table[1].pid = 1;
 }
 
 void proc_post_setup(fs_node_t *root_node) {
@@ -71,14 +70,14 @@ void proc_post_setup(fs_node_t *root_node) {
     proc_table[1].pwd = root_node;
 }
 
-void save_curr_sp() __critical {
-    proc_table[proc_cur].stack_pointer = tmp_stack_pointer;
-}
+// void save_curr_sp() __critical {
+    // proc_table[proc_cur].stack_pointer = tmp_stack_pointer;
+// }
 
-void load_curr_sp() __critical {
-    tmp_stack_pointer = proc_table[proc_cur].stack_pointer;
+// void load_curr_sp() __critical {
+    // tmp_stack_pointer = proc_table[proc_cur].stack_pointer;
 
-    __asm
-    ld      sp, (_tmp_stack_pointer)
-    __endasm;
-}
+    // __asm
+    // ld      sp, (_tmp_stack_pointer)
+    // __endasm;
+// }
