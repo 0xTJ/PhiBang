@@ -8,5 +8,6 @@ extern struct char_device acia_device;
 int acia_init();
 int acia_put(char c);
 int acia_get();
+int acia_get_wait();
 
 #endif

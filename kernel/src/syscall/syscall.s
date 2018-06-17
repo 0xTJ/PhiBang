@@ -49,7 +49,7 @@ done_params:
 
     add     hl, bc
     add     hl, bc          ; Address of address of syscall function in HL
-
+    
     ld      e, (hl)
     inc     hl
     ld      d, (hl)         ; Address of syscall function in DE
@@ -60,6 +60,7 @@ done_params:
 
 10000$:
     ld      sp, (buff)
+    call    #_sched
 _bootstrap_exec::
     call    exit_kernel
     ld      de, (_sysc_ret)

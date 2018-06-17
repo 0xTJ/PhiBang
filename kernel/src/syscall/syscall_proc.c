@@ -34,5 +34,5 @@ int execvp(const char *file, char *const argv[]) {
 }
 
 void _exit(int status) {
-    
+    proc_table[proc_cur].pid = 0;
 }
