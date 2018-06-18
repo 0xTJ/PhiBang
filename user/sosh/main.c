@@ -1,5 +1,4 @@
 #include <unistd.h>
-#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -9,24 +8,24 @@ void getString(char *buffer, size_t sz) {
     size_t i = 0;
     uint8_t stop = 0;
     while (!stop) {
-        int in = fgetc(stdin);
-        switch (in) {
-        case EOF:
+        char in;
+        if (read(0, &in, 1) < 1)
             continue;
+        switch (in) {
         case '\b':
             if (i > 0) {
                 i--;
-                fputs("\033[D\033[0K", stdout);
+                write(1, "\033[D\033[0K", sizeof("\033[D\033[0K") - 1);
             }
             continue;
         case '\n':
-            fputc('\n', stdout);
+            write(1, "\n", 1);
             stop = 1;
             break;
         default:
             if (i < sz - 1) {
                 buffer[i++] = in;
-                fputc(in, stdout);
+                write(1, &in, 1);
             }
         }
     }
@@ -36,8 +35,11 @@ void getString(char *buffer, size_t sz) {
     char line[65];
     argc;
     argv;
-    fputs("> ", stdout);
+    write(1, "Enter .drl size", sizeof());
     getString(line, 65);
-    fputs(line, stdout);
+    int length = 0;
+    for (int i = 0; line[i]; ++i)
+        length = length * 10 + line[i];
+    malloc(
     return 0;
 }

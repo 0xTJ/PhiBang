@@ -57,6 +57,7 @@ int close(int fildes) {
     close_fs(proc_table[proc_cur].ofile_tab[fildes]->node);
     kfree(proc_table[proc_cur].ofile_tab[fildes]);
     proc_table[proc_cur].ofile_tab[fildes] = NULL;
+    return 0;
 }
 
 size_t read(int fildes, void *buffer, size_t nbyte) {
@@ -112,5 +113,6 @@ ssize_t write(int fildes, const void *buffer, size_t nbyte) {
 }
 
 int mount(char *device, char *path, int fs_num) {// use dev path
+    (void)device; (void)path; (void)fs_num;
     return -1;
 }

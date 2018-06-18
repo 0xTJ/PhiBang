@@ -48,26 +48,19 @@ void init() {
     open("/dev/acia", O_WRONLY|O_CREAT|O_APPEND);
     open("/dev/acia", O_WRONLY|O_CREAT|O_APPEND);
 
-    KLOG(INFO, "About to enter kernel");
-
     __asm
     call (enter_kernel)
     __endasm;
-    KLOG(INFO, "Entered kernel");
-    KLOG(INFO, "Loading binary");
+    KLOG(INFO, "Loading /sosh.bin");
     execvp("/sosh.bin", NULL);
-    KLOG(INFO, "Loaded binary");
-    KLOG(INFO, "About to exit kernel");
     __asm
     call (exit_kernel);
     __endasm;
-    KLOG(INFO, "Exited kernel");
-    KLOG(INFO, "About to jump into user");
     __asm
     ld      hl, #0xA000
     jp      (hl)
     __endasm;
-    KLOG(INFO, "Failed binary");
+    KLOG(ERROR, "Failed binary");
     // Never try to return here. The previous stack has been obliterated, and you'll return on an unknown value.
 }
 

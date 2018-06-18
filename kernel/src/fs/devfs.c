@@ -1,9 +1,9 @@
 #include "fs/devfs.h"
 #include <string.h>
-#include <stdio.h>
 #include "kio.h"
 #include "mem.h"
 #include "dev.h"
+#include "eof.h"
 
 fs_node_t *devfs_root;
 fs_node_t *dev_root_nodes[DEVICE_COUNT];
@@ -24,9 +24,11 @@ static size_t devfs_read(fs_node_t *node, off_t offset, size_t size, uint8_t *bu
         }
         return i;
     case FS_BLOCKDEVICE:
-        offset;
+        (void)offset;
+        return 0;
+    default:
+        return 0;
     }
-    return 0;
 }
 
 static ssize_t devfs_write(fs_node_t *node, off_t offset, size_t size, uint8_t *buffer) {
@@ -42,9 +44,11 @@ static ssize_t devfs_write(fs_node_t *node, off_t offset, size_t size, uint8_t *
         }
         return i;
     case FS_BLOCKDEVICE:
-        offset;
+        (void)offset;
+        return 0;
+    default:
+        return -1;
     }
-    return -1;
 }
 
 static struct dirent *devfs_readdir(fs_node_t *node, uint32_t index) {

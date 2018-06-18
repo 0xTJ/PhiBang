@@ -26,13 +26,14 @@ int execvp(const char *file, char *const argv[]) {
     entries = kmalloc(sizeof(struct drlEntry) * header.offLen);
     read_fs(drlFd, sizeof(struct drlHeader), sizeof(struct drlEntry) * header.offLen, (void *)entries);
     read_fs(drlFd, sizeof(struct drlHeader) + (sizeof(struct drlEntry) * header.offLen), 0x0800 - (sizeof(struct drlHeader) + sizeof(struct drlEntry) * header.offLen), (void *)0xA000);
-    KLOG(INFO, "Done read, about to relocate");
     processDrl(&header, entries, (void *)0xA000, (void *)0xA800);
-    sysc_ret = 0xA000;
-    curr_sp = 0xB000;
-    argv;
+    sysc_ret = (void *)0xA000;
+    curr_sp = (void *)0xB000;
+    (void)argv;
+    return -1;
 }
 
 void _exit(int status) {
     proc_table[proc_cur].pid = 0;
+    (void)status;
 }

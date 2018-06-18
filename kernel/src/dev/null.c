@@ -1,5 +1,6 @@
 #include "dev/null.h"
-#include <stdio.h>
+#include <stddef.h>
+#include <eof.h>
 
 struct char_device null_device = {
     NULL,
