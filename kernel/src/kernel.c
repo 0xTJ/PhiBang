@@ -1,7 +1,11 @@
 #include <stdbool.h>
 #include <fcntl.h>
+#include <eof.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include "proc.h"
+#include "delrel.h"
 #include "dev.h"
 #include "dev/acia.h"
 #include "dev/null.h"
@@ -28,6 +32,72 @@ const char welcome[] =
 "      by 0xTJ      " "\n"
 ;
 
+void readOfSize(size_t size, void *position) {
+    size_t i = 0;
+    while (i < size) {
+        int get = acia_device.get();
+        if (get == EOF)
+            continue;
+        *((uint8_t *) ((uint8_t *) position + i)) = get;
+        acia_device.put('.');
+        ++i;
+    }
+}
+
+extern void *sysc_ret;
+extern void *curr_sp;
+void loadBin() {
+    size_t size = 0x0000;
+    struct drlHeader header;
+    struct drlEntry *entries;
+
+    kprint("Enter HEX size of binary file 0x");
+    while (true) {
+        int get = acia_device.get();
+        if (get == EOF) {
+            continue;
+        } else if (get == '\n') {
+            acia_device.put(get);
+            break;
+        } else if ('0' <= get && get <= '9') {
+            acia_device.put(get);
+            size = size * 0x10 + (get - '0');
+        } else if ('A' <= get && get <= 'F') {
+            acia_device.put(get);
+            size = size * 0x10 + (get - 'A' + 0xA);
+        } else if ('a' <= get && get <= 'f') {
+            acia_device.put(get);
+            size = size * 0x10 + (get - 'a' + 0xA);
+        } else {
+            continue;
+        }
+    }
+
+    kprint("Length is ");
+    kput_uint16(size);
+    kprint("\n");
+
+    kprint("Reading ");
+    kput_uint16(sizeof(struct drlHeader));
+    kprint("bytes\n");
+    readOfSize(sizeof(struct drlHeader), &header);
+
+    entries = kmalloc(sizeof(struct drlEntry) * header.offLen);
+    kprint("Reading ");
+    kput_uint16(sizeof(struct drlEntry) * header.offLen);
+    kprint("bytes\n");
+    readOfSize(sizeof(struct drlEntry) * header.offLen, (void *)entries);
+
+    kprint("Reading ");
+    kput_uint16(size - (sizeof(struct drlHeader) + sizeof(struct drlEntry) * header.offLen));
+    kprint("bytes\n");
+    readOfSize(size - (sizeof(struct drlHeader) + sizeof(struct drlEntry) * header.offLen), (void *)0xA000);
+    
+    processDrl(&header, entries, (void *)0xA000, (void *)0xA800);
+    sysc_ret = (void *)0xA000;
+    curr_sp = (void *)0xB000;
+}
+
 void init() {
     fs_node_t *dev_dir;
 
@@ -51,16 +121,27 @@ void init() {
     __asm
     call (enter_kernel)
     __endasm;
-    KLOG(INFO, "Loading /sosh.bin");
-    execvp("/sosh.bin", NULL);
+    loadBin();
+    KLOG(INFO, "About to exit kernel");
     __asm
     call (exit_kernel);
     __endasm;
+    KLOG(INFO, "Exited kernel");
     __asm
     ld      hl, #0xA000
     jp      (hl)
     __endasm;
-    KLOG(ERROR, "Failed binary");
+
+    __asm
+    call (enter_kernel)
+    __endasm;
+    KLOG(INFO, "Dropping down to Sosh");
+    execvp("/sosh.bin", NULL);
+    __asm
+    call (exit_kernel);
+    __endasm;
+    KLOG(ERROR, "Failed Sosh");
+    while (true) {}
     // Never try to return here. The previous stack has been obliterated, and you'll return on an unknown value.
 }
 

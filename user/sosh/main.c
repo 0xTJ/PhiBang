@@ -2,8 +2,6 @@
 #include <stdint.h>
 #include <string.h>
 
-short test;
-
 void getString(char *buffer, size_t sz) {
     size_t i = 0;
     uint8_t stop = 0;
@@ -35,11 +33,7 @@ void getString(char *buffer, size_t sz) {
     char line[65];
     argc;
     argv;
-    write(1, "Enter .drl size", sizeof());
     getString(line, 65);
-    int length = 0;
-    for (int i = 0; line[i]; ++i)
-        length = length * 10 + line[i];
-    malloc(
+    write(1, line, strlen(line));
     return 0;
 }
