@@ -94,7 +94,6 @@ void loadBin() {
     readOfSize(size - (sizeof(struct drlHeader) + sizeof(struct drlEntry) * header.offLen), (void *)0xA000);
     
     processDrl(&header, entries, (void *)0xA000, (void *)0xA800);
-    sysc_ret = (void *)0xA000;
     curr_sp = (void *)0xB000;
 }
 
