@@ -7,6 +7,8 @@ void delay(int num) {
         for (i = 0; i < 30000; ++i) {}
 }
 
+char req[] = "GET /websiteos/example_of_a_simple_html_page.htm HTTP/1.1\nHost: help.websiteos.com\n\n";
+
 void setRemote(const char *host, const char *port) {
     delay(10);
 
@@ -29,18 +31,17 @@ void setRemote(const char *host, const char *port) {
 int main (int argc, char *argv[]) {
     (void) argc; (void) argv;
 
-    setRemote("127.0.0.1", "0");
-    setRemote("www.google.com", "80");
+    setRemote("help.websiteos.com", "80");
     write(1, "EX\r\n", 4);
     delay(30);
-    write(1, "dasfsdafdsafsd\r\n\r\ndasds\r\n\r\nfasds", sizeof("dasfsdafdsafsd\r\n\r\ndasds\r\n\r\nfasds") - 1);
-    
+    write(1, req, sizeof(req) - 1);
+    delay(30);
+
     delay(20);
     write(1, "+++", 3);
     delay(20);
     
-    setRemote("127.0.0.1", "0");
-
-
-    return 0;
+    setRemote("towel.blinkenlights.nl", "23");
+    write(1, "EX\r\n", 4);
+    while(1) {}
 }
