@@ -1,7 +1,7 @@
 #ifndef _INCLUDE_KIO_H
 #define _INCLUDE_KIO_H
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)

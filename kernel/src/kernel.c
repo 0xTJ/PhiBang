@@ -117,27 +117,29 @@ void init() {
     open("/dev/acia", O_WRONLY|O_CREAT|O_APPEND);
     open("/dev/acia", O_WRONLY|O_CREAT|O_APPEND);
 
-    __asm
-    call (enter_kernel)
-    __endasm;
-    loadBin();
-    KLOG(INFO, "About to exit kernel");
-    __asm
-    call (exit_kernel);
-    __endasm;
-    KLOG(INFO, "Exited kernel");
-    __asm
-    ld      hl, #0xA000
-    jp      (hl)
-    __endasm;
+    // __asm
+    // call (enter_kernel)
+    // __endasm;
+    //loadBin();
+    // KLOG(INFO, "About to exit kernel");
+    // __asm
+    // call (exit_kernel);
+    // __endasm;
+    // KLOG(INFO, "Exited kernel");
+    // __asm
+    // ld      hl, #0xA000
+    // jp      (hl)
+    // __endasm;
 
     __asm
     call (enter_kernel)
     __endasm;
     KLOG(INFO, "Dropping down to Sosh");
-    execvp("/sosh.bin", NULL);
+    execvp("/webby.bin", NULL);
     __asm
     call (exit_kernel);
+    ld      hl, #0xA000
+    jp      (hl)
     __endasm;
     KLOG(ERROR, "Failed Sosh");
     while (true) {}

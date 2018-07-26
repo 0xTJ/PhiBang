@@ -62,7 +62,6 @@ int close(int fildes) {
 
 size_t read(int fildes, void *buffer, size_t nbyte) {
     struct ofile *filep;
-    KLOG(INFO, "read");
     
     if (fildes < 0 || fildes >= RLIMIT_NOFILE || nbyte == 0 || buffer == NULL)
         return 0;
@@ -89,7 +88,6 @@ size_t read(int fildes, void *buffer, size_t nbyte) {
 
 ssize_t write(int fildes, const void *buffer, size_t nbyte) {
     struct ofile *filep;
-    KLOG(INFO, "write");
     
     if (fildes < 0 || fildes >= RLIMIT_NOFILE || nbyte == 0 || buffer == NULL)
         return -1;
