@@ -16,7 +16,10 @@ REL = $(ASM_REL) $(C_REL)
 
 .PHONY: all clean
 
-all: sosh.bin
+all: ../../initrd/initrd/sosh.bin
+
+../../initrd/initrd/%.bin: %.bin
+	cp $< $@
 
 sosh.bin: sosh_0000.bin sosh_8000.bin
 	python deltrelator.py $^ $@

@@ -18,9 +18,10 @@ extern void *kern_sp;
 extern unsigned char proc_mem[RLIMIT_AS];
 
 void proc_init_enter1(void (*entry)(void)) {
-    int i, j;
-
+    /* Clear proc_table */
+    int i;
     for (i = 0; i < TASK_MAX; i++) {
+        int j;
         proc_table[i].pid = 0;
         proc_table[i].mem = NULL;
         proc_table[i].stack_pointer = NULL;
@@ -29,8 +30,6 @@ void proc_init_enter1(void (*entry)(void)) {
         for (j = 0; j < RLIMIT_NOFILE; j++)
             proc_table[i].ofile_tab[j] = NULL;
     }
-
-    proc_table[1].pid = 1;
 
     proc_table[1].mem = proc_mem;
     proc_table[1].stack_pointer = proc_mem + RLIMIT_AS;

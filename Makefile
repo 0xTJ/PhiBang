@@ -5,7 +5,7 @@ all: libc kernel
 libc:
 	$(MAKE) -C libc
 
-initrd:
+initrd: sosh
 	$(MAKE) -C initrd
 
 sosh: libc

@@ -21,7 +21,7 @@ int execvp(const char *file, char *const argv[]) {
     struct drlHeader header;
     struct drlEntry *entries;
     fs_node_t *drlFd = _traverse_path(initrd_root, file);
-
+    
     read_fs(drlFd, 0, sizeof(struct drlHeader), (void *)&header);
     entries = kmalloc(sizeof(struct drlEntry) * header.offLen);
     read_fs(drlFd, sizeof(struct drlHeader), sizeof(struct drlEntry) * header.offLen, (void *)entries);
